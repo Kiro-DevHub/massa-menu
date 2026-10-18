@@ -12,7 +12,7 @@ export const BATCH_NAMES = {
 
 export type BatchKey = keyof typeof BATCH_NAMES
 
-export const RECIPES = {
+const RECIPE_DATA = {
   omeletCheese: {
     name: "Омлет с сыром и тостами",
     kind: "b",
@@ -652,4 +652,6 @@ export const RECIPES = {
   },
 } satisfies Record<string, Recipe>
 
-export type RecipeId = keyof typeof RECIPES
+export type RecipeId = keyof typeof RECIPE_DATA
+
+export const RECIPES: Readonly<Record<RecipeId, Recipe>> = RECIPE_DATA

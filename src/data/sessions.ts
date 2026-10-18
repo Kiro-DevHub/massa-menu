@@ -1,7 +1,7 @@
 // Перенесено 1-в-1 из reference/menu-reference.html. Паритет проверяет src/data/data-parity.test.ts.
 import type { Session } from './types'
 
-export const SESSIONS = {
+const SESSION_DATA = {
   tue: {
     name: "Гуляш и люля",
     day: 1,
@@ -128,6 +128,8 @@ export const SESSIONS = {
   },
 } satisfies Record<string, Session>
 
-export type SessionId = keyof typeof SESSIONS
+export type SessionId = keyof typeof SESSION_DATA
+
+export const SESSIONS: Readonly<Record<SessionId, Session>> = SESSION_DATA
 
 export const SESSION_ORDER: readonly SessionId[] = ["sun", "tue", "thu", "sat"]

@@ -3,7 +3,7 @@ import type { Product } from './types'
 
 export const CATEGORIES = ["Мясо и рыба", "Крупы и макароны", "Хлеб и лаваш", "Молочка и яйца", "Фрукты и овощи", "Перекусы и напитки", "Соусы и бакалея"] as const
 
-export const PRODUCTS = {
+const PRODUCT_DATA = {
   chicken: { name: "Куриная грудка", unit: "г", cat: 0, meat: true, step: 50 },
   beefMince: { name: "Говяжий фарш 10%", unit: "г", cat: 0, meat: true, step: 50 },
   beef: { name: "Говядина (лопатка)", unit: "г", cat: 0, meat: true, step: 50 },
@@ -51,4 +51,6 @@ export const PRODUCTS = {
   nutella: { name: "Нутелла", unit: "г", cat: 6, staple: true },
 } satisfies Record<string, Product>
 
-export type ProductId = keyof typeof PRODUCTS
+export type ProductId = keyof typeof PRODUCT_DATA
+
+export const PRODUCTS: Readonly<Record<ProductId, Product>> = PRODUCT_DATA
