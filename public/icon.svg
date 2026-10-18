@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <!-- Контейнер для заготовок с полоской малярного скотча на чугунном фоне. -->
-  <rect width="512" height="512" fill="#0f100e"/>
+  <rect width="512" height="512" fill="#0d0f12"/>
   <rect x="100" y="146" width="312" height="58" rx="24" fill="#d5d9d0"/>
   <rect x="100" y="188" width="312" height="16" fill="#b7bcb1"/>
   <path d="M120 204h272l-17 158a44 44 0 0 1-43.7 39H180.7a44 44 0 0 1-43.7-39z" fill="#f5b524"/>

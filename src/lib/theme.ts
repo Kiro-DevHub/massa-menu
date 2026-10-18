@@ -17,7 +17,7 @@ export function useResolvedTheme(): 'light' | 'dark' {
   return pref === 'auto' ? (sysDark ? 'dark' : 'light') : pref
 }
 
-const THEME_COLOR = { light: '#eceee8', dark: '#0f100e' } as const
+const THEME_COLOR = { light: '#edeff2', dark: '#0d0f12' } as const
 
 /** Вешает .dark на <html> и синхронизирует цвет статус-бара. */
 export function useApplyTheme() {

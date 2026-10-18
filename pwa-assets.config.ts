@@ -1,7 +1,7 @@
 import { defineConfig, minimal2023Preset } from '@vite-pwa/assets-generator/config'
 
 // Иконки из public/icon.svg: фон у иконки сплошной, поэтому подложки apple и maskable того же цвета.
-const bg = '#0f100e'
+const bg = '#0d0f12'
 
 export default defineConfig({
   headLinkOptions: { preset: '2023' },

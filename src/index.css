@@ -9,47 +9,45 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  «Мил-преп на спортивной кухне».
-  Чугун и нержавейка вместо чистого чёрного, шафран — акцент и углеводы,
-  белки синие, жиры розовые. ok/warn/bad — своя шкала: warn коралловый,
-  чтобы не путаться с шафраном. Малярный скотч одинаковый в обеих темах:
-  это физический предмет, он не «темнеет».
+  «Мил-преп на спортивной кухне»: воронёная сталь (тёмная) и нержавейка (светлая).
+  Шафран — акцент и углеводы, белки синие, жиры розовые; ok/warn/bad — отдельная шкала,
+  warn коралловый. Скотч на контейнерах одинаковый в обеих темах: это физический предмет.
 */
 :root {
-  --bg: #eceee8;
+  --bg: #edeff2;
   --surface: #ffffff;
-  --surface-2: #e2e5de;
-  --surface-3: #d5d9d0;
-  --line: #d0d4ca;
-  --ink: #131611;
-  --ink-2: #3a4036;
-  --muted: #586054;
+  --surface-2: #e4e7ec;
+  --surface-3: #d3d8df;
+  --line: #d9dde3;
+  --ink: #101216;
+  --ink-2: #383d46;
+  --muted: #5a616c;
 
-  --saffron: #e0a100;
-  --saffron-ink: #855900;
-  --on-saffron: #1c1400;
-  --prot: #2f5fcc;
-  --fat: #c03d78;
-  --carb: #d99a00;
+  --saffron: #e5a312;
+  --saffron-ink: #875a00;
+  --on-saffron: #1a1200;
+  --prot: #2b5fd9;
+  --fat: #c63c7d;
+  --carb: #e5a312;
 
-  --ok: #1f7f4b;
-  --warn: #c4501c;
-  --bad: #c2312a;
-  --ice: #2f6fb0;
+  --ok: #16794a;
+  --warn: #c2511d;
+  --bad: #c42e28;
+  --ice: #2a6db6;
 
   --tape: #ead9a4;
   --tape-edge: #d9c587;
   --tape-ink: #2a2110;
 
-  --shadow-card: 0 1px 0 rgb(19 22 17 / 0.04), 0 8px 24px -16px rgb(19 22 17 / 0.28);
-  --shadow-float: 0 12px 32px -12px rgb(19 22 17 / 0.35);
-  --scrim: rgb(10 12 9 / 0.45);
-  --tabbar: rgb(255 255 255 / 0.78);
+  --shadow-card: 0 1px 2px rgb(16 18 22 / 0.05), 0 10px 28px -18px rgb(16 18 22 / 0.35);
+  --shadow-float: 0 16px 40px -14px rgb(16 18 22 / 0.4);
+  --scrim: rgb(12 14 18 / 0.45);
+  --tabbar: rgb(248 249 251 / 0.8);
   --seg-on: #ffffff;
-  --dock: #1b1e19;
-  --dock-fg: #eef0e9;
+  --dock: #16191e;
+  --dock-fg: #f0f2f5;
   /* iOS с black-translucent рисует белый текст статус-бара: в светлой теме под ним тёмная полоса. */
-  --statusbar: #131611;
+  --statusbar: #101216;
 
   /* shadcn */
   --background: var(--bg);
@@ -69,44 +67,44 @@
   --border: var(--line);
   --input: var(--line);
   --ring: var(--saffron);
-  --radius: 0.875rem;
+  --radius: 1rem;
 
   color-scheme: light;
 }
 
 .dark {
-  --bg: #0f100e;
-  --surface: #191b17;
-  --surface-2: #22251f;
-  --surface-3: #2c3028;
-  --line: #2d3129;
-  --ink: #eef0e9;
-  --ink-2: #c8ccc1;
-  --muted: #9aa094;
+  --bg: #0d0f12;
+  --surface: #16191e;
+  --surface-2: #1f2329;
+  --surface-3: #2a2f36;
+  --line: #262a31;
+  --ink: #f0f2f5;
+  --ink-2: #c4c9d1;
+  --muted: #8f96a1;
 
-  --saffron: #f5b524;
-  --saffron-ink: #f5b524;
-  --on-saffron: #1c1400;
-  --prot: #7ea4ff;
-  --fat: #f37cb0;
-  --carb: #f5b524;
+  --saffron: #f6b72f;
+  --saffron-ink: #f6b72f;
+  --on-saffron: #1a1200;
+  --prot: #7ea6ff;
+  --fat: #ff80b4;
+  --carb: #f6b72f;
 
-  --ok: #5dcb8b;
-  --warn: #ff8a5c;
-  --bad: #ff6159;
-  --ice: #79b6ff;
+  --ok: #4fd08e;
+  --warn: #ff8d5e;
+  --bad: #ff5f58;
+  --ice: #7ab9ff;
 
   --tape: #e3d19a;
   --tape-edge: #c9b678;
   --tape-ink: #2a2110;
 
-  --shadow-card: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 10px 24px -18px rgb(0 0 0 / 0.9);
-  --shadow-float: 0 14px 36px -12px rgb(0 0 0 / 0.75);
-  --scrim: rgb(0 0 0 / 0.6);
-  --tabbar: rgb(25 27 23 / 0.72);
-  --seg-on: #363a31;
-  --dock: #2a2e26;
-  --dock-fg: #eef0e9;
+  --shadow-card: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 12px 28px -20px rgb(0 0 0 / 0.9);
+  --shadow-float: 0 18px 40px -14px rgb(0 0 0 / 0.8);
+  --scrim: rgb(0 0 0 / 0.62);
+  --tabbar: rgb(18 21 25 / 0.74);
+  --seg-on: #323841;
+  --dock: #262b32;
+  --dock-fg: #f0f2f5;
   --statusbar: var(--bg);
 
   color-scheme: dark;
@@ -166,7 +164,8 @@
   --shadow-card: var(--shadow-card);
   --shadow-float: var(--shadow-float);
 
-  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Движение по токенам astryx: fast 175ms, medium 410ms. */
+  --ease-out-soft: cubic-bezier(0.24, 1, 0.4, 1);
 }
 
 @layer base {

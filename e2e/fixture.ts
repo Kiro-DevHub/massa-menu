@@ -14,7 +14,7 @@ export function midweek(): AppData {
   d.pantry = {
     chicken: 520, beefMince: 240, rice: 1400, pasta: 380, bulgur: 450, eggs: 9, cheese: 160, milk: 1200,
     bread: 380, lavash: 120, cottage: 200, banana: 5, apple: 3, juice: 900, cookies: 150, nuts: 110,
-    protein: 640, tomatoSauce: 600, yogurtDrink: 2, veg: 400, creamCheese: 140,
+    protein: 640, tomatoSauce: 600, yogurtDrink: 2, veg: 400, creamCheese: 140, salmon: 300,
   }
   d = doSession(d, 'sun', addDays(TODAY, -1), ids)
   // Контейнер с прошлой недели, который пора выбросить.

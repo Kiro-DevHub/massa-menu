@@ -4,14 +4,14 @@ import { shopping, shoppingCount } from '@/logic/shopping'
 import { cn } from '@/lib/utils'
 import { useAppStore } from '@/store/app-store'
 import { useToday } from '@/store/hooks'
-import { BagIcon, FridgeIcon, PlateIcon, PotIcon, ScaleIcon } from './icons'
+import { CookingPot, Refrigerator, ShoppingBasket, UtensilsCrossed, Weight } from 'lucide-react'
 
 const TABS = [
-  { to: '/', label: 'Сегодня', Icon: PlateIcon, match: (p: string) => p === '/' || p.startsWith('/recipe') },
-  { to: '/prep', label: 'Заготовки', Icon: PotIcon, match: (p: string) => p.startsWith('/prep') },
-  { to: '/stock', label: 'Склад', Icon: FridgeIcon, match: (p: string) => p.startsWith('/stock') },
-  { to: '/shop', label: 'Покупки', Icon: BagIcon, match: (p: string) => p.startsWith('/shop') },
-  { to: '/weight', label: 'Вес', Icon: ScaleIcon, match: (p: string) => p.startsWith('/weight') },
+  { to: '/', label: 'Сегодня', Icon: UtensilsCrossed, match: (p: string) => p === '/' || p.startsWith('/recipe') },
+  { to: '/prep', label: 'Заготовки', Icon: CookingPot, match: (p: string) => p.startsWith('/prep') },
+  { to: '/stock', label: 'Склад', Icon: Refrigerator, match: (p: string) => p.startsWith('/stock') },
+  { to: '/shop', label: 'Покупки', Icon: ShoppingBasket, match: (p: string) => p.startsWith('/shop') },
+  { to: '/weight', label: 'Вес', Icon: Weight, match: (p: string) => p.startsWith('/weight') },
 ] as const
 
 export const TABBAR_H = 58
@@ -40,7 +40,7 @@ export function TabBar() {
                 on ? 'text-ink' : 'text-muted-foreground',
               )}
             >
-              <Icon className={cn('size-[26px] transition-colors', on && 'text-saffron-ink')} />
+              <Icon className={cn('size-6 transition-colors', on && 'text-saffron-ink')} strokeWidth={on ? 2.1 : 1.75} aria-hidden />
               {label}
               {to === '/shop' && count > 0 && (
                 <span className="num absolute top-1 left-[calc(50%+6px)] grid h-[18px] min-w-[18px] place-items-center rounded-full bg-saffron px-1 text-[11px] font-bold text-on-saffron">
