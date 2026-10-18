@@ -1,32 +1,46 @@
-# React + TypeScript + Vite
+# Меню на массу
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Недельное меню для набора массы: рецепты с КБЖУ, заготовки, склад продуктов и список покупок. Работает без интернета, данные хранятся только на телефоне.
 
-Currently, two official plugins are available:
+**Открыть:** https://kiro-devhub.github.io/massa-menu/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Как поставить на iPhone
 
-## React Compiler
+1. Открой ссылку выше **в Safari** (в других браузерах на iPhone пункта нет).
+2. Нажми «Поделиться» (квадрат со стрелкой вверх).
+3. Пролистай меню и выбери «На экран Домой», затем «Добавить».
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Иконка с контейнером появится на экране «Домой». Запускай приложение с неё: так оно открывается во весь экран, работает офлайн и реже теряет данные.
 
-## Expanding the Oxlint configuration
+## Бэкап
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+iPhone может стереть данные веб-приложения, если долго им не пользоваться или мало места. Поэтому раз в неделю:
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+1. Настройки (шестерёнка вверху справа) → «Бэкап» → **«Сохранить»**.
+2. В меню «Поделиться» выбери «Сохранить в Файлы» (например, в iCloud Drive).
+
+Восстановить: Настройки → «Бэкап» → **«Загрузить»**, выбери файл `massa-menu-ГГГГ-ММ-ДД.json` и подтверди замену. Подходит и для переноса на другое устройство. Файлы из старой версии меню (одностраничного прототипа) тоже принимаются.
+
+## Разработка
+
+```bash
+npm install
+npm run dev          # http://127.0.0.1:5173/massa-menu/
+npm test             # Vitest: логика склада, заготовок, покупок, веса, бэкапа
+npm run build        # сборка в dist/ + service worker
+npm run e2e          # Playwright: скриншоты всех экранов, офлайн, устанавливаемость
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Скриншоты складываются в `screenshots/{dark,light}/`. Если `npx playwright install` недоступен, можно указать уже скачанный Chromium: `PW_CHROMIUM=путь/к/chrome.exe npm run e2e`.
+
+Иконки генерируются из `public/icon.svg`: `npx pwa-assets-generator`.
+
+### Где что лежит
+
+- `reference/menu-reference.html` — исходный прототип, из него перенесены данные и логика.
+- `src/data` — продукты, рецепты, меню, заготовки, пресеты (1-в-1 с прототипом, сверяется тестом).
+- `src/logic` — чистые функции: списание, заготовки, симуляция по дням, покупки, напоминания, вес, бэкап.
+- `src/store` — Zustand с хранением в IndexedDB, версия схемы и миграции.
+- `src/screens`, `src/components` — интерфейс (React, Tailwind, shadcn/ui с перекрашенной темой).
+
+Деплой: каждый push в `main` собирает и публикует сайт через GitHub Actions (`.github/workflows/deploy.yml`).
