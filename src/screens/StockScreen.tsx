@@ -65,7 +65,7 @@ function Fridge() {
       <div className="rounded-[22px] border border-line bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface-2)_70%,transparent),transparent_120px)] px-3 pt-5 pb-2">
         {rows.map((row, i) => (
           <div key={i} className="mb-3">
-            <div className="grid grid-cols-2 items-end gap-3 px-1">
+            <div className="grid grid-cols-2 gap-3 px-1">
               {row.map((f) => (
                 <Tub key={f.id} f={f} today={today} />
               ))}
@@ -75,7 +75,7 @@ function Fridge() {
           </div>
         ))}
       </div>
-      <p className="text-[13.5px] text-muted-foreground">«−1» — если выбросил или отдал порцию. Съеденное списывается само, когда отмечаешь «Съел».</p>
+      <p className="text-[13.5px] text-muted-foreground">«−1», если выбросил или отдал порцию. Съеденное списывается само, когда отмечаешь «Съел».</p>
     </div>
   )
 }
@@ -110,7 +110,7 @@ function Tub({ f, today }: { f: FridgeItem; today: ISODate }) {
         <span className="font-display text-[22px] leading-none font-semibold">×{f.n}</span>
         {status}
       </div>
-      <div className="mt-1 grid grid-cols-2 gap-2">
+      <div className="mt-auto grid grid-cols-2 gap-2 pt-1">
         <button
           type="button"
           aria-label={`Убрать одну порцию: ${name}`}

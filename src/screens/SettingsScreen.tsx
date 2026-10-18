@@ -1,7 +1,7 @@
 import { Download, Monitor, Moon, ShieldCheck, ShieldAlert, Sun, Upload } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { BackLink, Card, Eyebrow, Note } from '@/components/common'
+import { BackLink, Card, Eyebrow } from '@/components/common'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -117,11 +117,11 @@ export default function SettingsScreen() {
             {days == null
               ? 'Бэкапа ещё не было.'
               : days === 0
-                ? 'Последний бэкап — сегодня.'
-                : `Последний бэкап — ${dateLong(iso(new Date(lastBackup!)))}, ${days} ${plural(days, ['день', 'дня', 'дней'])} назад.`}
+                ? 'Последний бэкап сделан сегодня.'
+                : `Последний бэкап: ${dateLong(iso(new Date(lastBackup!)))}, ${days} ${plural(days, ['день', 'дня', 'дней'])} назад.`}
           </p>
           <div className="grid grid-cols-2 gap-2">
-            <Button variant="ink" onClick={exportNow}>
+            <Button onClick={exportNow}>
               <Download aria-hidden />
               Сохранить
             </Button>
@@ -144,9 +144,9 @@ export default function SettingsScreen() {
 
       <section className="flex flex-col gap-2.5">
         <Eyebrow>Сброс</Eyebrow>
-        <Note tone="ice" className="text-[14.5px]">
+        <p className="text-[14.5px] text-muted-foreground">
           Стирает отметки, склад, покупки и вес. Меню и рецепты остаются. Сначала сохрани бэкап, если данные ещё нужны.
-        </Note>
+        </p>
         <Button variant="destructive" onClick={() => setResetOpen(true)}>
           Стереть все данные
         </Button>

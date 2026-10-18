@@ -44,7 +44,9 @@ export function TimerDock({ withTabBar }: { withTabBar: boolean }) {
                 transition={{ type: 'spring', stiffness: 420, damping: 34 }}
                 className={cn(
                   'pointer-events-auto relative flex items-center gap-3 overflow-hidden rounded-2xl py-2 pr-2 pl-4 shadow-[var(--shadow-float)]',
-                  done ? 'animate-[ring-pulse_1s_ease-in-out_infinite] bg-saffron text-on-saffron' : 'bg-ink text-bg',
+                  done
+                    ? 'animate-[ring-pulse_1s_ease-in-out_infinite] bg-saffron text-on-saffron'
+                    : 'border border-white/8 bg-[var(--dock)] text-[var(--dock-fg)]',
                 )}
                 role="timer"
                 aria-label={`${t.label}: ${done ? 'готово' : mmss(left)}`}
@@ -52,21 +54,23 @@ export function TimerDock({ withTabBar }: { withTabBar: boolean }) {
                 {!done && (
                   <span
                     aria-hidden
-                    className="absolute inset-y-0 left-0 origin-left bg-saffron/18"
-                    style={{ width: '100%', transform: `scaleX(${progress})`, transition: 'transform 0.5s linear' }}
+                    className="absolute bottom-0 left-0 h-[3px] w-full origin-left bg-saffron"
+                    style={{ transform: `scaleX(${progress})`, transition: 'transform 0.5s linear' }}
                   />
                 )}
-                <span className="relative font-display min-w-[4.6ch] text-[21px] font-semibold">
-                  {done ? <BellRing className="size-6" aria-hidden /> : mmss(left)}
-                </span>
-                <span className="relative min-w-0 flex-1 truncate text-[14.5px] font-medium opacity-90">
-                  {done ? `Готово: ${t.label}` : t.label}
+                {done ? (
+                  <BellRing className="size-6 flex-none" aria-hidden />
+                ) : (
+                  <span className="font-display min-w-[4.4ch] flex-none text-[22px] leading-none font-semibold text-saffron">{mmss(left)}</span>
+                )}
+                <span className="min-w-0 flex-1 text-[14px] leading-tight font-medium">
+                  <span className="line-clamp-2">{done ? `Готово: ${t.label}` : t.label}</span>
                 </span>
                 {!done && (
                   <button
                     type="button"
                     onClick={() => addMinute(t.id)}
-                    className="relative inline-flex h-11 items-center gap-0.5 rounded-xl bg-bg/14 px-3 text-[14px] font-semibold"
+                    className="inline-flex h-11 flex-none items-center rounded-xl bg-white/10 px-2.5 text-[14px] font-semibold"
                     aria-label={`Добавить минуту: ${t.label}`}
                   >
                     <Plus className="size-4" aria-hidden />1 мин
@@ -75,7 +79,7 @@ export function TimerDock({ withTabBar }: { withTabBar: boolean }) {
                 <button
                   type="button"
                   onClick={() => stop(t.id)}
-                  className={cn('relative h-11 rounded-xl px-3.5 text-[14px] font-semibold', done ? 'bg-black/12' : 'bg-bg/14')}
+                  className={cn('h-11 flex-none rounded-xl px-3.5 text-[14px] font-semibold', done ? 'bg-black/12' : 'bg-white/10')}
                 >
                   {done ? 'Ок' : 'Стоп'}
                 </button>

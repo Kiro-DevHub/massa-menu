@@ -90,7 +90,7 @@ export function ExtraFoodDrawer({ date, open, onOpenChange }: { date: ISODate; o
                 {error}
               </p>
             )}
-            <Button type="submit" variant="ink" size="lg" className="mt-1">
+            <Button type="submit" size="lg" className="mt-1">
               Добавить
             </Button>
           </form>

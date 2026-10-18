@@ -6,7 +6,7 @@ import { TopRow } from '@/components/AppShell'
 import { Chip, EmptyState, Eyebrow, Note, PageTitle, SectionTitle } from '@/components/common'
 import { QtyInput } from '@/components/QtyInput'
 import { Button } from '@/components/ui/button'
-import { addDays, dateShort, relDay, untilDay, type ISODate } from '@/logic/dates'
+import { addDays, dateLong, relDay, untilDay, type ISODate } from '@/logic/dates'
 import { fmtQ } from '@/logic/format'
 import { roundBuy, shopFreezerHint, shopping, type Shopping } from '@/logic/shopping'
 import { useAppStore } from '@/store/app-store'
@@ -52,7 +52,7 @@ export default function ShopScreen() {
 
         {trip.length > 0 && (
           <Group
-            title={tripToday ? 'Закупка сегодня' : `Закупка ${relDay(today, sh.trip)}, ${dateShort(sh.trip)}`}
+            title={tripToday ? 'Закупка сегодня' : `Закупка ${relDay(today, sh.trip)}, ${dateLong(sh.trip)}`}
             sub={`Хватит до ${untilDay(today, lastDay)} включительно, следующая закупка ${relDay(today, sh.after)}.`}
           >
             {trip.map((id) => (
@@ -67,7 +67,7 @@ export default function ShopScreen() {
               <li key={id} className="flex min-h-14 items-center gap-3 py-1.5 pr-2 pl-4">
                 <div className="min-w-0 flex-1 font-semibold">{PRODUCTS[id].name}</div>
                 <Button
-                  variant="ink"
+                  variant="secondary"
                   onClick={() => {
                     stapleBought(id)
                     toast(`Куплено: ${PRODUCTS[id].name}`, { action: { label: 'Отменить', onClick: () => toggleStaple(id) } })
@@ -154,7 +154,7 @@ function BuyRow({ id, need, sh, today }: { id: ProductId; need: number; sh: Shop
         </div>
       </div>
       <QtyInput value={qty} unit={p.unit} label={`Сколько купил: ${p.name}`} onCommit={setQty} className="gap-1" />
-      <Button variant="ink" onClick={onBuy} className="px-3.5">
+      <Button variant="secondary" onClick={onBuy} className="px-3.5">
         Купил
       </Button>
     </li>

@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { ChevronRight, Undo2 } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { Link } from 'wouter'
 import type { SlotInfo } from '@/data'
 import { CHECK_PATH } from '@/components/icons'
@@ -82,7 +82,6 @@ export function MealCard({ date, today, slot, entry, source, isNext, onEat, onSk
                 onClick={onUndo}
                 className="flex h-11 items-center justify-center gap-1 border-t border-line text-[13px] font-medium text-muted-foreground active:bg-surface-2"
               >
-                <Undo2 className="size-3.5" aria-hidden />
                 Отменить
               </button>
             ) : (

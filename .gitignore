@@ -26,4 +26,4 @@ dist-ssr
 # Tests
 test-results
 playwright-report
-/screenshots/*.png
+/screenshots/

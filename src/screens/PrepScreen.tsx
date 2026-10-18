@@ -3,7 +3,8 @@ import { Link } from 'wouter'
 import { BATCH_NAMES, RECIPES, SESSIONS } from '@/data'
 import { TopRow } from '@/components/AppShell'
 import { Chip, Eyebrow, PageTitle } from '@/components/common'
-import { dateShort, DW_ACC, DW_FULL, weekday } from '@/logic/dates'
+import { dateShort, DW_FULL } from '@/logic/dates'
+import { plural } from '@/logic/format'
 import { prepOrder, type PrepStatus } from '@/logic/prep'
 import { cn } from '@/lib/utils'
 import { useAppStore } from '@/store/app-store'
@@ -30,7 +31,7 @@ function when(st: PrepStatus) {
   if (st.doneAt) return null
   if (st.inDays === 0) return { tone: 'saffron' as const, text: 'сегодня' }
   if (st.inDays === 1) return { tone: 'neutral' as const, text: 'завтра' }
-  return { tone: 'neutral' as const, text: DW_ACC[weekday(st.planned)] }
+  return { tone: 'neutral' as const, text: `через ${st.inDays} ${plural(st.inDays, ['день', 'дня', 'дней'])}` }
 }
 
 function PrepCard({ st, first }: { st: PrepStatus; first: boolean }) {

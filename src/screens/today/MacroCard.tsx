@@ -52,9 +52,9 @@ export function MacroCard({ date, next }: { date: ISODate; next: string | null }
           )
         })}
       </div>
-      <div className="mt-1.5 flex justify-between text-[12px] text-muted-foreground" aria-hidden>
-        <span>Завтрак</span>
-        {extraK > 0 ? <span className="num text-saffron-ink">+{fmt(extraK)} вне меню</span> : <span>Ужин</span>}
+      <div className="num mt-2 flex justify-between gap-3 text-[13px] text-muted-foreground">
+        <span>{eat.k < plan.k ? `осталось ${fmt(plan.k - eat.k)} ккал` : 'план дня выполнен'}</span>
+        {extraK > 0 && <span className="text-saffron-ink">+{fmt(extraK)} вне меню</span>}
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-3">

@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils'
 import { useAppStore } from '@/store/app-store'
 import { useToday } from '@/store/hooks'
 
-const fmt = (x: number | null) => (x == null ? '—' : fmtKg(x))
+const fmt = (x: number | null) => (x == null ? 'нет' : fmtKg(x))
 
 export default function WeightScreen() {
   const today = useToday()
@@ -38,7 +38,7 @@ export default function WeightScreen() {
   return (
     <>
       <TopRow />
-      <PageTitle title="Вес" sub="Взвешивайся утром натощак 3–4 раза в неделю. Смотри на среднее за неделю: скачки на 0,5–1 кг за день — это вода." />
+      <PageTitle title="Вес" sub="Взвешивайся утром натощак 3–4 раза в неделю. Смотри на среднее за неделю: скачки на 0,5–1 кг за день бывают из-за воды и соли." />
 
       <form onSubmit={submit} className="mt-5 flex flex-col gap-2" noValidate>
         <label htmlFor="kg" className="text-[13.5px] font-medium text-muted-foreground">
@@ -58,7 +58,7 @@ export default function WeightScreen() {
             }}
             className="num h-12 flex-1 font-display text-[20px] font-semibold"
           />
-          <Button type="submit" variant="ink" className="h-12 px-5">
+          <Button type="submit" className="h-12 px-5">
             {todays ? 'Обновить' : 'Сохранить'}
           </Button>
         </div>
@@ -72,7 +72,7 @@ export default function WeightScreen() {
       <div className="mt-5 grid grid-cols-3 gap-2">
         <Stat v={fmt(st.cur)} k="среднее за 7 дней" />
         <Stat v={fmt(st.prev)} k="2 недели назад" />
-        <Stat v={st.delta == null ? '—' : (st.delta >= 0 ? '+' : '−') + fmtKg(Math.abs(st.delta))} k="изменение" accent />
+        <Stat v={st.delta == null ? 'нет' : (st.delta >= 0 ? '+' : '−') + fmtKg(Math.abs(st.delta))} k="изменение" accent />
       </div>
 
       <Note className="mt-3">
