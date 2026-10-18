@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Контейнер для заготовок с полоской малярного скотча на чугунном фоне. -->
+  <rect width="512" height="512" fill="#0f100e"/>
+  <rect x="100" y="146" width="312" height="58" rx="24" fill="#d5d9d0"/>
+  <rect x="100" y="188" width="312" height="16" fill="#b7bcb1"/>
+  <path d="M120 204h272l-17 158a44 44 0 0 1-43.7 39H180.7a44 44 0 0 1-43.7-39z" fill="#f5b524"/>
+  <path d="M120 204h272l-2.3 22H122.3z" fill="#d99a00"/>
+  <g transform="rotate(-5 256 296)">
+    <path d="M150 262l6-4 200 2 4 5-2 30 3 31-5 4-202-2-5-5 3-30z" fill="#ece0b4"/>
+    <path d="M182 298c12-14 22 10 34-2s20 10 32-1 22 8 34-2" fill="none" stroke="#2a2110" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

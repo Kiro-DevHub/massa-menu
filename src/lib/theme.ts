@@ -22,6 +22,15 @@ const THEME_COLOR = { light: '#eceee8', dark: '#0f100e' } as const
 /** Вешает .dark на <html> и синхронизирует цвет статус-бара. */
 export function useApplyTheme() {
   const theme = useResolvedTheme()
+  const pref = useAppStore((s) => s.settings.theme)
+  useEffect(() => {
+    // Копия выбора темы для скрипта в index.html: он красит фон до загрузки бандла.
+    try {
+      localStorage.setItem('massa-theme', JSON.stringify(pref))
+    } catch {
+      /* приватный режим */
+    }
+  }, [pref])
   useEffect(() => {
     const root = document.documentElement
     root.classList.toggle('dark', theme === 'dark')

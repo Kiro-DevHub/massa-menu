@@ -4,6 +4,7 @@ import { AppShell, Wordmark } from '@/components/AppShell'
 import { Toaster } from '@/components/ui/sonner'
 import { useApplyTheme } from '@/lib/theme'
 import { useHydrated } from '@/store/hooks'
+import { UpdatePrompt } from '@/components/UpdatePrompt'
 import { TodayScreen } from '@/screens/TodayScreen'
 import CookScreen from '@/screens/CookScreen'
 import PrepScreen from '@/screens/PrepScreen'
@@ -47,6 +48,7 @@ export default function App() {
         </Switch>
       </AppShell>
       <Toaster />
+      <UpdatePrompt />
     </Router>
   )
 }

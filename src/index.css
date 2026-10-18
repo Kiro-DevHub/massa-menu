@@ -46,6 +46,8 @@
   --scrim: rgb(10 12 9 / 0.45);
   --tabbar: rgb(255 255 255 / 0.78);
   --seg-on: #ffffff;
+  /* iOS с black-translucent рисует белый текст статус-бара: в светлой теме под ним тёмная полоса. */
+  --statusbar: #131611;
 
   /* shadcn */
   --background: var(--bg);
@@ -101,6 +103,7 @@
   --scrim: rgb(0 0 0 / 0.6);
   --tabbar: rgb(25 27 23 / 0.72);
   --seg-on: #363a31;
+  --statusbar: var(--bg);
 
   color-scheme: dark;
 }

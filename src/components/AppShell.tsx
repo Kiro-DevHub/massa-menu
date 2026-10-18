@@ -48,7 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <>
       {/* Подложка под чёлку, чтобы контент не просвечивал под статус-баром. */}
-      <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[env(safe-area-inset-top,0px)] bg-bg" />
+      <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[env(safe-area-inset-top,0px)] bg-[var(--statusbar)]" />
       <main
         ref={mainRef}
         tabIndex={-1}
