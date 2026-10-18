@@ -6,7 +6,7 @@ import { defaultSettings, SCHEMA_VERSION, type Settings, type Theme } from '@/lo
 import { todayISO, type ISODate } from '@/logic/dates'
 import { prune } from '@/logic/prune'
 import * as stock from '@/logic/stock'
-import { emptyData, uid, type AppData, type Extra } from '@/logic/types'
+import { emptyData, uid, type AppData, type Extra, type FridgeItem } from '@/logic/types'
 
 export interface Timer {
   id: string
@@ -29,6 +29,7 @@ interface AppState {
   doSession: (sid: SessionId) => void
   undoSession: (date: ISODate, sid: SessionId) => void
   adjustFridge: (id: string, delta: number) => void
+  restoreTub: (f: FridgeItem) => void
   setPantry: (id: ProductId, q: number) => void
   toggleStaple: (id: ProductId) => void
   stapleBought: (id: ProductId) => void
@@ -36,11 +37,12 @@ interface AppState {
   unbuy: (purchaseId: string) => void
   addExtra: (date: ISODate, extra: Omit<Extra, 'id'>) => void
   removeExtra: (date: ISODate, id: string) => void
-  setWeight: (kg: number) => void
+  setWeight: (kg: number, date?: ISODate) => void
   removeWeight: (date: ISODate) => void
   replaceAll: (data: AppData, settings?: Settings | null) => void
   resetAll: () => void
   setTheme: (theme: Theme) => void
+  markBackup: () => void
 
   startTimer: (sec: number, label: string) => void
   stopTimer: (id: string) => void
@@ -81,6 +83,7 @@ export const useAppStore = create<AppState>()(
         doSession: (sid) => commit((d, t) => stock.doSession(d, sid, t)),
         undoSession: (date, sid) => commit((d) => stock.undoSession(d, date, sid)),
         adjustFridge: (id, delta) => commit((d) => stock.adjustFridge(d, id, delta)),
+        restoreTub: (f) => commit((d) => ({ ...d, fridge: stock.sortFridge([...d.fridge.filter((x) => x.id !== f.id), f]) })),
         setPantry: (id, q) => commit((d) => stock.setPantry(d, id, q)),
         toggleStaple: (id) => commit((d) => stock.toggleStaple(d, id)),
         stapleBought: (id) => commit((d) => stock.stapleBought(d, id)),
@@ -88,11 +91,12 @@ export const useAppStore = create<AppState>()(
         unbuy: (pid) => commit((d) => stock.unbuy(d, pid)),
         addExtra: (date, x) => commit((d) => stock.addExtra(d, date, x)),
         removeExtra: (date, id) => commit((d) => stock.removeExtra(d, date, id)),
-        setWeight: (kg) => commit((d, t) => stock.setWeight(d, t, kg)),
+        setWeight: (kg, date) => commit((d, t) => stock.setWeight(d, date ?? t, kg)),
         removeWeight: (date) => commit((d) => stock.removeWeight(d, date)),
-        replaceAll: (data, settings) => set((s) => ({ data: prune(data, todayISO()), settings: settings ?? s.settings })),
+        replaceAll: (data, settings) => set((s) => ({ data: prune(data, todayISO()), settings: settings ? { ...s.settings, theme: settings.theme } : s.settings })),
         resetAll: () => set({ data: emptyData(), timers: [] }),
         setTheme: (theme) => set((s) => ({ settings: { ...s.settings, theme } })),
+        markBackup: () => set((s) => ({ settings: { ...s.settings, lastBackup: new Date().toISOString() } })),
 
         startTimer: (sec, label) =>
           set((s) => ({ timers: [...s.timers, { id: uid(), end: Date.now() + sec * 1000, total: sec, label, rang: false }] })),

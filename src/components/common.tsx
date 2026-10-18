@@ -20,13 +20,13 @@ export function Chip({ tone = 'neutral', icon, children, className }: { tone?: T
   return (
     <span
       className={cn(
-        'inline-flex max-w-full items-center gap-1.5 rounded-full px-2.5 py-[3px] text-[13px] leading-5 font-medium [&_svg]:size-3.5 [&_svg]:shrink-0',
+        'inline-flex max-w-full items-center gap-1.5 rounded-[11px] px-2.5 py-[3px] text-[13px] leading-5 font-medium [&_svg]:size-3.5 [&_svg]:shrink-0',
         TONE[tone],
         className,
       )}
     >
       {icon}
-      <span className="truncate">{children}</span>
+      <span className="min-w-0">{children}</span>
     </span>
   )
 }

@@ -45,6 +45,7 @@
   --shadow-float: 0 12px 32px -12px rgb(19 22 17 / 0.35);
   --scrim: rgb(10 12 9 / 0.45);
   --tabbar: rgb(255 255 255 / 0.78);
+  --seg-on: #ffffff;
 
   /* shadcn */
   --background: var(--bg);
@@ -99,6 +100,7 @@
   --shadow-float: 0 14px 36px -12px rgb(0 0 0 / 0.75);
   --scrim: rgb(0 0 0 / 0.6);
   --tabbar: rgb(25 27 23 / 0.72);
+  --seg-on: #363a31;
 
   color-scheme: dark;
 }

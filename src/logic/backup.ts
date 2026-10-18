@@ -6,6 +6,8 @@ import { emptyData, type AppData, type DayLog, type Extra, type FridgeItem, type
 export type Theme = 'auto' | 'light' | 'dark'
 export interface Settings {
   theme: Theme
+  /** Когда последний раз сохраняли бэкап (ISO-время). */
+  lastBackup?: string
 }
 export const defaultSettings = (): Settings => ({ theme: 'auto' })
 
