@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'wouter'
 import { toast } from 'sonner'
 import { SLOTS, type SessionId, type Slot } from '@/data'
-import { addDays, dateLong, DW_FULL, weekday } from '@/logic/dates'
+import { addDays, dateLong, dayMonth, DW, DW_FULL, weekday } from '@/logic/dates'
 import { recipeAt } from '@/logic/menu'
 import { nextSlot } from '@/logic/nutrition'
 import { dayReminders } from '@/logic/reminders'
@@ -90,7 +90,17 @@ function DayView({ date, today }: { date: string; today: string }) {
 
   const L = data.log[date]
   const reminders = useMemo(() => dayReminders(data, today, date), [data, today, date])
+  const next = nextSlot(data, today, date)
   const sources = Object.fromEntries(SLOTS.map((s) => [s.key, mealSource(data, today, date, s.key)])) as Record<Slot, MealSource>
+
+  // Дата на скотче самого старого контейнера: его и съешь первым.
+  let nextTape: string | undefined
+  const nextSrc = next ? sources[next] : null
+  if (next && (nextSrc?.kind === 'fridge' || nextSrc?.kind === 'freezer')) {
+    const key = recipeAt(date, next).batch
+    const tub = data.fridge.filter((f) => f.key === key).sort((a, b) => (a.cooked < b.cooked ? -1 : 1))[0]
+    if (tub) nextTape = `${DW[weekday(tub.cooked)]} ${dayMonth(tub.cooked)}`
+  }
 
   const onEat = (slot: Slot) => {
     const r = recipeAt(date, slot)
@@ -104,7 +114,7 @@ function DayView({ date, today }: { date: string; today: string }) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <DayHero date={date} />
       {date === today && <Notices items={reminders} />}
       <Timeline
@@ -112,7 +122,8 @@ function DayView({ date, today }: { date: string; today: string }) {
         today={today}
         entries={L?.slots ?? {}}
         sources={sources}
-        next={nextSlot(data, today, date)}
+        next={next}
+        nextTape={nextTape}
         extras={L?.extras ?? []}
         reminders={reminders}
         doneSessions={Object.keys(L?.sessions ?? {}) as SessionId[]}

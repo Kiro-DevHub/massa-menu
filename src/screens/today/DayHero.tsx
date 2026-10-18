@@ -40,25 +40,27 @@ export function DayHero({ date }: { date: ISODate }) {
   ]
 
   return (
-    <section aria-label="Итог дня" className="pt-3">
-      <div className="flex items-start justify-between gap-3">
-        <div className="font-display text-[68px] leading-[0.9] font-light tracking-[-0.045em]">
-          <CountUp value={eat.k} />
+    <section aria-label="Итог дня" className="pt-2">
+      <div className="flex items-end justify-between gap-3">
+        <div className="flex min-w-0 items-baseline gap-2">
+          <span className="font-display text-[46px] leading-none font-light tracking-[-0.045em]">
+            <CountUp value={eat.k} />
+          </span>
+          <span className="num text-[15px] whitespace-nowrap text-muted-foreground">/ {fmt(plan.k)} ккал</span>
         </div>
         {gym && (
-          <span className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-saffron/40 px-3 py-1 text-[13px] font-semibold text-saffron-ink">
+          <span className="mb-1 inline-flex flex-none items-center gap-1.5 rounded-full bg-saffron/14 px-2.5 py-1 text-[12.5px] font-semibold text-saffron-ink">
             <Dumbbell className="size-3.5" aria-hidden />
-            зал
+            день зала
           </span>
         )}
       </div>
-      <p className="num mt-2.5 text-[15px] text-muted-foreground">
-        из {fmt(plan.k)} ккал{' '}
-        <span className="text-ink-2">{left > 0 ? `· осталось ${fmt(left)}` : '· план выполнен'}</span>
-        {extraK > 0 && <span className="block text-saffron-ink">в том числе {fmt(extraK)} вне меню</span>}
+      <p className="num mt-1.5 text-[14px] text-muted-foreground">
+        {left > 0 ? `Осталось ${fmt(left)} ккал` : 'План дня выполнен'}
+        {extraK > 0 && <span className="text-saffron-ink">, из них {fmt(extraK)} вне меню</span>}
       </p>
 
-      <div className="mt-5 flex gap-1.5" role="img" aria-label={`Белки ${Math.round(eat.p)} из ${plan.p} г, жиры ${Math.round(eat.f)} из ${plan.f} г, углеводы ${Math.round(eat.c)} из ${plan.c} г`}>
+      <div className="mt-4 flex gap-1.5" role="img" aria-label={`Белки ${Math.round(eat.p)} из ${plan.p} г, жиры ${Math.round(eat.f)} из ${plan.f} г, углеводы ${Math.round(eat.c)} из ${plan.c} г`}>
         {parts.map((p) => (
           <div key={p.key} className="min-w-0" style={{ flexGrow: p.share, flexBasis: 0 }}>
             <div className={cn('h-2.5 overflow-hidden rounded-full', p.track)}>
@@ -69,10 +71,10 @@ export function DayHero({ date }: { date: ISODate }) {
                 transition={{ duration: 0.41, ease: [0.24, 1, 0.4, 1] }}
               />
             </div>
-            <div className="mt-2 truncate text-[12.5px] text-muted-foreground">{p.label}</div>
-            <div className="num text-[15px] font-semibold">
+            <div className="mt-2 truncate text-[12.5px] leading-tight text-muted-foreground">{p.label}</div>
+            <div className="num mt-0.5 text-[14px] leading-tight font-semibold whitespace-nowrap">
               {Math.round(p.have)}
-              <span className="font-normal text-muted-foreground">/{p.need}</span>
+              <span className="font-normal text-muted-foreground">/{p.need}&nbsp;г</span>
             </div>
           </div>
         ))}

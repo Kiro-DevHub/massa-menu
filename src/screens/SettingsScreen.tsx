@@ -1,7 +1,7 @@
 import { Download, Monitor, Moon, ShieldCheck, ShieldAlert, Sun, Upload } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { BackLink, Card, Eyebrow } from '@/components/common'
+import { BackLink, Card, GroupLabel } from '@/components/common'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -80,14 +80,14 @@ export default function SettingsScreen() {
   const sum = pending ? backupSummary(pending.data) : null
 
   return (
-    <div className="flex flex-col gap-6 pt-2">
+    <div className="flex flex-col gap-7 pt-2">
       <div>
         <BackLink to="/">Назад</BackLink>
-        <h1 className="mt-2 font-display text-[28px] leading-[1.08] font-semibold tracking-[-0.02em]">Настройки</h1>
+        <h1 className="mt-2 font-display text-[30px] leading-[1.1] font-medium tracking-[-0.035em]">Настройки</h1>
       </div>
 
-      <section className="flex flex-col gap-2.5">
-        <Eyebrow>Тема</Eyebrow>
+      <section className="flex flex-col gap-2">
+        <GroupLabel>Тема</GroupLabel>
         <Tabs value={theme} onValueChange={(v) => setTheme(v as Theme)}>
           <TabsList aria-label="Тема оформления">
             <TabsTrigger value="auto">
@@ -106,8 +106,8 @@ export default function SettingsScreen() {
         </Tabs>
       </section>
 
-      <section className="flex flex-col gap-2.5">
-        <Eyebrow>Бэкап</Eyebrow>
+      <section className="flex flex-col gap-2">
+        <GroupLabel>Бэкап</GroupLabel>
         <Card className="flex flex-col gap-3 p-4">
           <p className="text-[15px] leading-snug">
             Всё хранится только на этом устройстве. iPhone может стереть данные приложения, если его долго не открывать. Сохраняй бэкап раз в неделю в «Файлы» или
@@ -133,7 +133,7 @@ export default function SettingsScreen() {
           <input ref={fileRef} type="file" accept="application/json,.json" className="sr-only" tabIndex={-1} aria-hidden onChange={(e) => onFile(e.target.files?.[0])} />
         </Card>
         {persisted !== null && (
-          <p className="flex items-start gap-2 text-[13.5px] text-muted-foreground">
+          <p className="flex items-start gap-2 px-1 text-[13.5px] leading-snug text-muted-foreground">
             {persisted ? <ShieldCheck className="mt-0.5 size-4 flex-none text-ok" aria-hidden /> : <ShieldAlert className="mt-0.5 size-4 flex-none text-warn" aria-hidden />}
             {persisted
               ? 'Браузер обещал не очищать хранилище. Бэкап всё равно не помешает.'
@@ -142,9 +142,9 @@ export default function SettingsScreen() {
         )}
       </section>
 
-      <section className="flex flex-col gap-2.5">
-        <Eyebrow>Сброс</Eyebrow>
-        <p className="text-[14.5px] text-muted-foreground">
+      <section className="flex flex-col gap-2">
+        <GroupLabel>Сброс</GroupLabel>
+        <p className="px-1 text-[14.5px] leading-snug text-muted-foreground">
           Стирает отметки, склад, покупки и вес. Меню и рецепты остаются. Сначала сохрани бэкап, если данные ещё нужны.
         </p>
         <Button variant="destructive" onClick={() => setResetOpen(true)}>

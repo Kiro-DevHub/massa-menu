@@ -22,7 +22,7 @@ export function QtyInput({
   const [text, setText] = useState(show(value))
   const [focused, setFocused] = useState(false)
   const [prev, setPrev] = useState(value)
-  // Значение поменялось снаружи (например, после «Съел») — показываем новое, если поле не в фокусе.
+  // Значение поменялось снаружи (например, после «Съел»): показываем новое, если поле не в фокусе.
   if (!focused && value !== prev) {
     setPrev(value)
     setText(show(value))
@@ -37,7 +37,7 @@ export function QtyInput({
   }
 
   return (
-    <label className={cn('flex flex-none items-center gap-1.5', className)}>
+    <label className={cn('flex h-11 flex-none items-center rounded-[12px] bg-surface-2 pr-2.5 transition-shadow focus-within:ring-2 focus-within:ring-saffron', className)}>
       <input
         type="text"
         inputMode="decimal"
@@ -51,9 +51,9 @@ export function QtyInput({
         onChange={(e) => setText(e.target.value.replace(/[^\d.,]/g, ''))}
         onBlur={commit}
         onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-        className="num h-11 w-[78px] rounded-xl border border-line bg-bg px-2.5 text-right text-[16px] font-semibold outline-none focus:border-saffron focus:ring-3 focus:ring-saffron/25"
+        className="num h-full w-[58px] bg-transparent pl-2.5 text-right text-[16px] font-semibold outline-none"
       />
-      <span className="w-6 text-[13.5px] text-muted-foreground">{unit}</span>
+      <span className="ml-1 w-5 text-[13.5px] text-muted-foreground">{unit}</span>
     </label>
   )
 }

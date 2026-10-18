@@ -28,7 +28,7 @@ export function Notices({ items }: { items: Reminder[] }) {
   }
   if (!rows.length) return null
   return (
-    <ul aria-label="Требует внимания" className="divide-y divide-line overflow-hidden rounded-[20px] border border-line bg-surface">
+    <ul aria-label="Требует внимания" className="divide-y divide-line overflow-hidden rounded-[20px] bg-surface dark:border dark:border-line">
       {rows.map((r) => (
         <li key={r.key}>
           <Link href={r.to} className="flex min-h-14 items-center gap-3 py-3 pr-3 pl-3.5 active:bg-surface-2">

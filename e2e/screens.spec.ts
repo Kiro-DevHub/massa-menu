@@ -79,7 +79,7 @@ for (const theme of ['dark', 'light'] as const) {
       await shoot(page, `${OUT}/${theme}/07-stock-pantry`)
       // Шторка «Вне меню».
       await open(page, '/')
-      await page.getByRole('button', { name: 'Добавить' }).first().click()
+      await page.getByRole('button', { name: 'Съел что-то не по плану' }).click()
       await page.waitForTimeout(600)
       await page.screenshot({ path: `${OUT}/${theme}/11-extra-drawer.png` })
     })

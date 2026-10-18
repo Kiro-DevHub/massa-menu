@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-const BG = '#0d0f12'
+const BG = '#edeff2'
 
 // https://vite.dev/config/
 export default defineConfig({

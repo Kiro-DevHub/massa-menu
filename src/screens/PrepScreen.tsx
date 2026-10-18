@@ -1,9 +1,8 @@
-import { Check, ChevronRight, Clock3 } from 'lucide-react'
+import { Check, ChevronRight } from 'lucide-react'
 import { Link } from 'wouter'
 import { BATCH_NAMES, RECIPES, SESSIONS } from '@/data'
-import { TopRow } from '@/components/AppShell'
-import { Chip, Eyebrow, PageTitle } from '@/components/common'
-import { dateShort, DW_FULL } from '@/logic/dates'
+import { Group, ScreenHeader } from '@/components/common'
+import { DW, dateShort } from '@/logic/dates'
 import { plural } from '@/logic/format'
 import { prepOrder, type PrepStatus } from '@/logic/prep'
 import { cn } from '@/lib/utils'
@@ -15,61 +14,52 @@ export default function PrepScreen() {
   const data = useAppStore((s) => s.data)
   const list = prepOrder(data, today)
   return (
-    <>
-      <TopRow />
-      <PageTitle title="Заготовки" sub="Четыре готовки в неделю. Отметь «Заготовка сделана», и контейнеры появятся в холодильнике, а продукты спишутся из кладовки." />
-      <div className="mt-5 flex flex-col gap-3">
+    <div className="flex flex-col gap-6">
+      <ScreenHeader title="Заготовки" sub="Четыре готовки в неделю. Отметь заготовку сделанной, и контейнеры появятся в холодильнике." />
+      <Group aria-label="Заготовки недели">
         {list.map((st, i) => (
-          <PrepCard key={st.sid} st={st} first={i === 0 && !st.doneAt} />
+          <PrepRow key={st.sid} st={st} first={i === 0 && !st.doneAt} />
         ))}
-      </div>
-    </>
+      </Group>
+    </div>
   )
 }
 
-function when(st: PrepStatus) {
-  if (st.doneAt) return null
-  if (st.inDays === 0) return { tone: 'saffron' as const, text: 'сегодня' }
-  if (st.inDays === 1) return { tone: 'neutral' as const, text: 'завтра' }
-  return { tone: 'neutral' as const, text: `через ${st.inDays} ${plural(st.inDays, ['день', 'дня', 'дней'])}` }
+function status(st: PrepStatus) {
+  if (st.doneAt) return { text: `сделано ${dateShort(st.doneAt)}`, cls: 'text-ok' }
+  if (st.inDays === 0) return { text: 'сегодня', cls: 'text-saffron-ink' }
+  if (st.inDays === 1) return { text: 'завтра', cls: 'text-ink-2' }
+  return { text: `через ${st.inDays} ${plural(st.inDays, ['день', 'дня', 'дней'])}`, cls: 'text-muted-foreground' }
 }
 
-function PrepCard({ st, first }: { st: PrepStatus; first: boolean }) {
+function PrepRow({ st, first }: { st: PrepStatus; first: boolean }) {
   const s = SESSIONS[st.sid]
-  const w = when(st)
+  const stat = status(st)
   return (
-    <Link
-      href={`/prep/${st.sid}`}
-      className={cn(
-        'flex items-center gap-3 rounded-2xl border bg-surface p-4 shadow-[var(--shadow-card)] active:bg-surface-2/60',
-        first ? 'border-saffron/70' : 'border-line',
-        st.doneAt && 'bg-surface/60',
-      )}
-    >
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <Eyebrow>
-            {DW_FULL[s.day]} · {s.when === 'morning' ? 'утро' : 'вечер'}
-          </Eyebrow>
-          <span className="flex-1" />
-          {st.doneAt ? (
-            <Chip tone="ok" icon={<Check />}>
-              сделано {dateShort(st.doneAt)}
-            </Chip>
-          ) : (
-            w && <Chip tone={w.tone}>{w.text}</Chip>
+    <li>
+      <Link href={`/prep/${st.sid}`} className="flex items-center gap-4 py-4 pr-3 pl-4 active:bg-surface-2">
+        <div
+          className={cn(
+            'grid size-14 flex-none place-content-center rounded-[16px] text-center',
+            st.doneAt ? 'bg-ok/12 text-ok' : first ? 'bg-saffron text-on-saffron' : 'bg-surface-2 text-ink',
           )}
+        >
+          {st.doneAt ? (
+            <Check className="mx-auto size-6" strokeWidth={2.6} aria-hidden />
+          ) : (
+            <span className="font-display text-[19px] leading-none font-medium">{DW[s.day]}</span>
+          )}
+          <span className={cn('mt-1 text-[11.5px] leading-none font-semibold', st.doneAt ? 'sr-only' : 'opacity-75')}>{s.when === 'morning' ? 'утро' : 'вечер'}</span>
         </div>
-        <h2 className={cn('mt-1.5 font-display text-[19px] leading-tight font-semibold', st.doneAt && 'text-muted-foreground')}>{s.name}</h2>
-        <p className="mt-1.5 text-[14.5px] leading-snug text-muted-foreground">
-          {s.makes.map((m) => `${BATCH_NAMES[RECIPES[m.recipe].batch!]} ×${m.n}`).join(' · ')} {s.covers}
-        </p>
-        <div className="mt-2 inline-flex items-center gap-1.5 text-[13.5px] text-muted-foreground">
-          <Clock3 className="size-3.5" aria-hidden />
-          около {s.time} мин
+        <div className="min-w-0 flex-1">
+          <div className={cn('text-[13px] font-semibold', stat.cls)}>{stat.text}</div>
+          <div className={cn('text-[17px] leading-snug font-semibold', st.doneAt && 'text-ink-2')}>{s.name}</div>
+          <div className="mt-0.5 text-[13.5px] leading-snug text-muted-foreground">
+            {s.makes.map((m) => `${BATCH_NAMES[RECIPES[m.recipe].batch!]} ×${m.n}`).join(', ')} {s.covers}, около {s.time} мин
+          </div>
         </div>
-      </div>
-      <ChevronRight className="size-5 flex-none text-muted-foreground" aria-hidden />
-    </Link>
+        <ChevronRight className="size-5 flex-none text-muted-foreground" aria-hidden />
+      </Link>
+    </li>
   )
 }

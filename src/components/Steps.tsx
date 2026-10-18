@@ -6,6 +6,7 @@ import { mmss } from '@/logic/format'
 import { cn } from '@/lib/utils'
 import { useAppStore } from '@/store/app-store'
 import { useUi } from '@/store/ui-store'
+import { Group } from './common'
 
 /** Кнопка таймера внутри шага. */
 export function TimerButton({ step, size = 'md' }: { step: Step; size?: 'md' | 'lg' }) {
@@ -22,7 +23,7 @@ export function TimerButton({ step, size = 'md' }: { step: Step; size?: 'md' | '
         toast(`Таймер запущен: ${label}`, { duration: 2000 })
       }}
       className={cn(
-        'inline-flex items-center gap-2 self-start rounded-full border border-saffron/60 bg-saffron/12 font-semibold text-saffron-ink active:scale-95 transition-transform',
+        'inline-flex items-center gap-2 self-start rounded-full bg-saffron/16 font-semibold text-saffron-ink transition-transform duration-[175ms] active:scale-95',
         size === 'lg' ? 'h-14 px-5 text-[18px]' : 'h-10 px-3.5 text-[14.5px]',
       )}
       aria-label={`Запустить таймер ${mmss(step.timer)}: ${label}`}
@@ -33,35 +34,35 @@ export function TimerButton({ step, size = 'md' }: { step: Step; size?: 'md' | '
   )
 }
 
-/** Список шагов: тап по шагу отмечает его, у шагов с таймером — кнопка запуска. */
+/** Шаги одним списком: номер — это и отметка «сделано», у шагов с таймером кнопка запуска. */
 export function StepsList({ steps, stepKey }: { steps: readonly Step[]; stepKey: string }) {
   const done = useUi((s) => s.doneSteps[stepKey])
   const toggle = useUi((s) => s.toggleStep)
   return (
-    <ol className="flex flex-col gap-2">
+    <Group>
       {steps.map((s, i) => {
         const on = !!done?.[i]
         return (
-          <li key={i} className={cn('flex gap-3 rounded-2xl border border-line bg-surface p-3.5 transition-opacity', on && 'opacity-55')}>
+          <li key={i} className="flex gap-3.5 px-4 py-4">
             <button
               type="button"
               aria-pressed={on}
-              aria-label={`Шаг ${i + 1}${on ? ', выполнен' : ''}`}
+              aria-label={`Шаг ${i + 1}${on ? ', сделан' : ', отметить сделанным'}`}
               onClick={() => toggle(stepKey, i)}
               className={cn(
-                'grid size-9 flex-none place-items-center rounded-full border-2 font-display text-[14px] font-semibold transition-colors after:absolute',
-                on ? 'border-ok bg-ok text-white' : 'border-line text-saffron-ink',
+                'relative grid size-8 flex-none place-items-center rounded-full font-display text-[14px] transition-colors duration-[175ms] after:absolute after:-inset-1.5',
+                on ? 'bg-ok text-white' : 'bg-surface-2 text-ink-2',
               )}
             >
               {on ? <Check className="size-4" strokeWidth={3} aria-hidden /> : i + 1}
             </button>
-            <div className="flex min-w-0 flex-1 flex-col gap-2.5 pt-1">
-              <p className="text-[16px] leading-relaxed">{s.text}</p>
+            <div className={cn('flex min-w-0 flex-1 flex-col gap-2.5 pt-1 transition-opacity duration-[175ms]', on && 'opacity-50')}>
+              <p className="text-[16px] leading-relaxed text-pretty">{s.text}</p>
               <TimerButton step={s} />
             </div>
           </li>
         )
       })}
-    </ol>
+    </Group>
   )
 }

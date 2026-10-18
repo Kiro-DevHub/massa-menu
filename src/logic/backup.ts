@@ -9,7 +9,7 @@ export interface Settings {
   /** Когда последний раз сохраняли бэкап (ISO-время). */
   lastBackup?: string
 }
-export const defaultSettings = (): Settings => ({ theme: 'auto' })
+export const defaultSettings = (): Settings => ({ theme: 'light' })
 
 export const BACKUP_APP = 'massa-menu'
 export const SCHEMA_VERSION = 1

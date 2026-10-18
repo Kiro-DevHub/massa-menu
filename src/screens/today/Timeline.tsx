@@ -3,7 +3,7 @@ import { Check, ChevronRight, CookingPot, Minus, Plus, Snowflake, X } from 'luci
 import type { ReactNode } from 'react'
 import { Link } from 'wouter'
 import { BATCH_NAMES, PRODUCTS, RECIPES, SESSIONS, SLOTS, type SessionId, type Slot, type SlotInfo } from '@/data'
-import { MacroLine } from '@/components/common'
+import { MacroLine, Tape } from '@/components/common'
 import { SourceLine } from '@/components/SourceChip'
 import { Button } from '@/components/ui/button'
 import type { ISODate } from '@/logic/dates'
@@ -58,35 +58,37 @@ interface MealProps {
   entry: SlotEntry | undefined
   source: MealSource
   isNext: boolean
+  /** Дата на скотче контейнера, если блюдо берётся из холодильника. */
+  tape?: string
   onEat: () => void
   onSkip: () => void
   onUndo: () => void
 }
 
-function MealNode({ date, today, slot, entry, source, isNext, onEat, onSkip, onUndo }: MealProps) {
+function MealNode({ date, today, slot, entry, source, isNext, tape, onEat, onSkip, onUndo }: MealProps) {
   const r = recipeAt(date, slot.key)
   const href = `/recipe/${date}/${slot.key}`
   const canMark = date <= today
   const state = entry ? (entry.st === 'eaten' ? 'eaten' : 'skipped') : isNext ? 'next' : 'pending'
 
+  // Отмеченный приём: одна строка названия и строка статуса с «Отменить».
   if (entry)
     return (
       <Row time={slot.time} marker={<MealMarker state={state} />}>
-        <div className="flex items-start gap-2">
-          <Link href={href} className="min-w-0 flex-1">
-            <div className={cn('text-[16px] leading-snug font-medium text-ink-2', entry.st === 'skipped' && 'text-muted-foreground line-through decoration-1')}>{r.name}</div>
-            <div className="num mt-0.5 flex flex-wrap items-center gap-x-2.5 text-[13px] text-muted-foreground">
-              <span>{r.k} ккал</span>
-              <SourceLine src={source} today={today} className="text-[13px]" />
-            </div>
-          </Link>
-          <button type="button" onClick={onUndo} className="-mt-2.5 -mr-2 h-11 flex-none rounded-xl px-2.5 text-[13.5px] font-medium text-muted-foreground active:bg-surface-2">
+        <Link href={href} className="block">
+          <div className={cn('text-[16px] leading-snug font-medium text-ink-2', entry.st === 'skipped' && 'text-muted-foreground line-through decoration-1')}>{r.name}</div>
+        </Link>
+        <div className="num -mb-2 flex flex-wrap items-center gap-x-3 text-[13px] text-muted-foreground">
+          <span>{r.k} ккал</span>
+          <SourceLine src={source} today={today} className="text-[13px]" />
+          <button type="button" onClick={onUndo} className="-my-1 h-9 rounded-[10px] px-1.5 font-medium text-ink-2 underline decoration-line underline-offset-4 active:bg-surface-2">
             Отменить
           </button>
         </div>
       </Row>
     )
 
+  // Ближайший приём: раскрытая карточка, главное действие экрана.
   if (isNext)
     return (
       <Row time={slot.time} timeTone="text-saffron-ink font-semibold" marker={<MealMarker state="next" />}>
@@ -94,10 +96,11 @@ function MealNode({ date, today, slot, entry, source, isNext, onEat, onSkip, onU
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.41, ease: EASE }}
-          className="-mt-3 rounded-[20px] border border-line bg-surface p-4 shadow-[var(--shadow-card)]"
+          className={cn('relative -mt-3 rounded-[20px] bg-surface p-4 shadow-[var(--shadow-card)] ring-1 ring-saffron/35', tape && 'mt-2 pt-6')}
         >
-          <div className="text-[13px] font-semibold text-saffron-ink">{slot.name} · дальше по плану</div>
-          <Link href={href} className="group mt-1 flex items-start gap-2">
+          {tape && <Tape className="absolute -top-3.5 left-4" label={`Контейнер приготовлен ${tape}`}>{tape}</Tape>}
+          <div className="text-[13px] font-semibold text-saffron-ink">{slot.name}, дальше по плану</div>
+          <Link href={href} className="mt-1 flex items-start gap-2">
             <h3 className="min-w-0 flex-1 text-[21px] leading-tight font-semibold tracking-[-0.01em]">{r.name}</h3>
             <ChevronRight className="mt-1 size-5 flex-none text-muted-foreground" aria-hidden />
           </Link>
@@ -120,27 +123,31 @@ function MealNode({ date, today, slot, entry, source, isNext, onEat, onSkip, onU
       </Row>
     )
 
+  // Остальные: содержимое и одна круглая галочка. «Не ел» — на раскрытой карточке и в рецепте.
   return (
     <Row time={slot.time} marker={<MealMarker state="pending" />}>
-      <Link href={href} className="block">
-        <div className="text-[13px] text-muted-foreground">{slot.name}</div>
-        <div className="mt-0.5 text-[17px] leading-snug font-semibold">{r.name}</div>
-        <div className="mt-1 flex flex-col gap-1">
-          <MacroLine m={r} />
-          <SourceLine src={source} today={today} />
-        </div>
-      </Link>
-      {canMark && (
-        <div className="mt-2.5 flex gap-2">
-          <Button variant="outline" size="sm" onClick={onEat} aria-label={`Съел: ${r.name}`} className="border-saffron/50 text-saffron-ink">
-            <Check aria-hidden />
-            Съел
-          </Button>
-          <Button variant="ghost" size="sm" onClick={onSkip} className="text-muted-foreground">
-            Не ел
-          </Button>
-        </div>
-      )}
+      <div className="flex items-start gap-3">
+        <Link href={href} className="block min-w-0 flex-1">
+          <div className="text-[13px] text-muted-foreground">{slot.name}</div>
+          <div className="mt-0.5 text-[17px] leading-snug font-semibold">{r.name}</div>
+          <div className="mt-1 flex flex-col gap-1">
+            <MacroLine m={r} />
+            <SourceLine src={source} today={today} />
+          </div>
+        </Link>
+        {canMark ? (
+          <button
+            type="button"
+            onClick={onEat}
+            aria-label={`Съел: ${r.name}`}
+            className="mt-3 grid size-11 flex-none place-items-center rounded-full border-2 border-saffron/55 text-saffron-ink transition-transform duration-[175ms] active:scale-90 active:bg-saffron/15"
+          >
+            <Check className="size-5" strokeWidth={2.6} aria-hidden />
+          </button>
+        ) : (
+          <ChevronRight className="mt-6 size-5 flex-none text-muted-foreground" aria-hidden />
+        )}
+      </div>
     </Row>
   )
 }
@@ -211,6 +218,7 @@ interface TimelineProps {
   entries: Partial<Record<Slot, SlotEntry>>
   sources: Record<Slot, MealSource>
   next: Slot | null
+  nextTape?: string
   extras: Extra[]
   reminders: Reminder[]
   doneSessions: SessionId[]
@@ -235,7 +243,7 @@ export function Timeline(p: TimelineProps) {
   const doneEvening = p.doneSessions.filter((sid) => SESSIONS[sid].when === 'evening' && !evening.includes(sid))
 
   return (
-    <ol aria-label="План дня" className="relative pt-2 before:absolute before:top-4 before:bottom-10 before:left-[59px] before:w-px before:bg-line">
+    <ol aria-label="План дня" className="relative pt-2 before:absolute before:top-4 before:bottom-10 before:left-[59px] before:w-px before:bg-surface-3">
       {[...doneMorning.map((sid) => [sid, true] as const), ...morning.map((sid) => [sid, false] as const)].map(([sid, done]) => (
         <SessionNode key={`s-${sid}`} sid={sid} done={done} />
       ))}
@@ -248,6 +256,7 @@ export function Timeline(p: TimelineProps) {
           entry={p.entries[s.key]}
           source={p.sources[s.key]}
           isNext={p.next === s.key}
+          tape={p.next === s.key ? p.nextTape : undefined}
           onEat={() => p.onEat(s.key)}
           onSkip={() => p.onSkip(s.key)}
           onUndo={() => p.onUndo(s.key)}

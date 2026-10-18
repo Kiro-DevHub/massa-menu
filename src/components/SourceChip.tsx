@@ -12,7 +12,7 @@ interface SourceInfo {
 }
 
 /** Человеческая подпись «откуда блюдо». */
-export function sourceInfo(src: MealSource, today: ISODate): SourceInfo | null {
+function sourceInfo(src: MealSource, today: ISODate): SourceInfo | null {
   switch (src.kind) {
     case 'eaten':
       return { icon: <Check />, text: src.fromFridge ? 'съедено из холодильника' : 'съедено', tone: 'ok' }

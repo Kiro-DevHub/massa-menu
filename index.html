@@ -8,17 +8,17 @@
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/icon.svg" sizes="any" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
-    <meta name="theme-color" content="#0d0f12" />
+    <meta name="theme-color" content="#edeff2" />
     <meta name="color-scheme" content="dark light" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Меню" />
-    <!-- Контент под статус-баром; полоса под чёлкой закрашивается в приложении. -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- Статус-бар обычный: iOS красит его по theme-color, которую приложение меняет вместе с темой. -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <script>
       // Тема до загрузки JS-бандла, чтобы не мигал светлый фон.
       try {
-        var t = JSON.parse(localStorage.getItem('massa-theme') || '"auto"')
+        var t = JSON.parse(localStorage.getItem('massa-theme') || '"light"')
         var dark = t === 'dark' || (t === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches)
         if (dark) document.documentElement.classList.add('dark')
       } catch (e) {}

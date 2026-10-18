@@ -4,14 +4,14 @@ import { shopping, shoppingCount } from '@/logic/shopping'
 import { cn } from '@/lib/utils'
 import { useAppStore } from '@/store/app-store'
 import { useToday } from '@/store/hooks'
-import { CookingPot, Refrigerator, ShoppingBasket, UtensilsCrossed, Weight } from 'lucide-react'
+import { ChartSpline, CookingPot, Refrigerator, ShoppingBasket, UtensilsCrossed } from 'lucide-react'
 
 const TABS = [
   { to: '/', label: 'Сегодня', Icon: UtensilsCrossed, match: (p: string) => p === '/' || p.startsWith('/recipe') },
   { to: '/prep', label: 'Заготовки', Icon: CookingPot, match: (p: string) => p.startsWith('/prep') },
   { to: '/stock', label: 'Склад', Icon: Refrigerator, match: (p: string) => p.startsWith('/stock') },
   { to: '/shop', label: 'Покупки', Icon: ShoppingBasket, match: (p: string) => p.startsWith('/shop') },
-  { to: '/weight', label: 'Вес', Icon: Weight, match: (p: string) => p.startsWith('/weight') },
+  { to: '/weight', label: 'Вес', Icon: ChartSpline, match: (p: string) => p.startsWith('/weight') },
 ] as const
 
 export const TABBAR_H = 58

@@ -46,8 +46,7 @@
   --seg-on: #ffffff;
   --dock: #16191e;
   --dock-fg: #f0f2f5;
-  /* iOS с black-translucent рисует белый текст статус-бара: в светлой теме под ним тёмная полоса. */
-  --statusbar: #101216;
+  --statusbar: var(--bg);
 
   /* shadcn */
   --background: var(--bg);

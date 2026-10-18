@@ -2,12 +2,12 @@ import { Minus, Plus, Refrigerator, Snowflake } from 'lucide-react'
 import { Link } from 'wouter'
 import { toast } from 'sonner'
 import { BATCH_NAMES, CATEGORIES, PRODUCTS, type ProductId } from '@/data'
-import { TopRow } from '@/components/AppShell'
-import { Chip, EmptyState, Eyebrow, PageTitle } from '@/components/common'
+import { EmptyState, Group, GroupLabel, ScreenHeader, Tape } from '@/components/common'
 import { QtyInput } from '@/components/QtyInput'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { dayMonth, DW, relDay, untilDay, weekday, type ISODate } from '@/logic/dates'
+import { plural } from '@/logic/format'
 import { pantryForecast } from '@/logic/shopping'
 import type { FridgeItem } from '@/logic/types'
 import { cn } from '@/lib/utils'
@@ -19,10 +19,9 @@ export default function StockScreen() {
   const tab = useUi((s) => s.stockTab)
   const setTab = useUi((s) => s.setStockTab)
   return (
-    <>
-      <TopRow />
-      <PageTitle title="Склад" />
-      <Tabs value={tab} onValueChange={(v) => setTab(v as 'fridge' | 'pantry')} className="mt-4">
+    <div className="flex flex-col gap-5">
+      <ScreenHeader title="Склад" />
+      <Tabs value={tab} onValueChange={(v) => setTab(v as 'fridge' | 'pantry')} className="gap-6">
         <TabsList>
           <TabsTrigger value="fridge">Холодильник</TabsTrigger>
           <TabsTrigger value="pantry">Кладовка</TabsTrigger>
@@ -34,11 +33,11 @@ export default function StockScreen() {
           <Pantry />
         </TabsContent>
       </Tabs>
-    </>
+    </div>
   )
 }
 
-/* ---------- Холодильник ---------- */
+/* ---------- Холодильник: контейнеры на полках, подписанные скотчем ---------- */
 
 function Fridge() {
   const today = useToday()
@@ -55,27 +54,30 @@ function Fridge() {
           </Button>
         }
       >
-        Сделай заготовку и отметь её, и контейнеры появятся здесь с датой готовки на скотче.
+        Отметь заготовку сделанной, и контейнеры появятся здесь с датой готовки на скотче.
       </EmptyState>
     )
   const rows: FridgeItem[][] = []
   for (let i = 0; i < items.length; i += 2) rows.push(items.slice(i, i + 2))
+  const portions = items.reduce((a, f) => a + f.n, 0)
   return (
-    <div className="flex flex-col gap-3">
-      <div className="rounded-[22px] border border-line bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface-2)_70%,transparent),transparent_120px)] px-3 pt-5 pb-2">
+    <div className="flex flex-col gap-4">
+      <div className="rounded-[24px] bg-surface-2/70 px-3 pt-6 pb-1 dark:bg-surface/60">
         {rows.map((row, i) => (
-          <div key={i} className="mb-3">
-            <div className="grid grid-cols-2 gap-3 px-1">
+          <div key={i} className="mb-5">
+            <div className="grid grid-cols-2 gap-3">
               {row.map((f) => (
                 <Tub key={f.id} f={f} today={today} />
               ))}
             </div>
-            {/* Полка */}
-            <div aria-hidden className="mt-2 h-2 rounded-full bg-surface-3 shadow-[0_3px_0_rgb(0_0_0/0.12)]" />
+            {/* Стеклянная полка */}
+            <div aria-hidden className="-mx-1 mt-2.5 h-1.5 rounded-full bg-gradient-to-b from-white/80 to-surface-3 shadow-[0_2px_4px_rgb(0_0_0/0.08)] dark:from-white/10 dark:to-surface-3" />
           </div>
         ))}
       </div>
-      <p className="text-[13.5px] text-muted-foreground">«−1», если выбросил или отдал порцию. Съеденное списывается само, когда отмечаешь «Съел».</p>
+      <p className="px-1 text-[13.5px] leading-snug text-muted-foreground">
+        {portions} {plural(portions, ['порция', 'порции', 'порций'])}. Съеденное списывается само, когда отмечаешь «Съел». Кнопка «−» нужна, если порцию выбросил или отдал.
+      </p>
     </div>
   )
 }
@@ -83,59 +85,56 @@ function Fridge() {
 function Tub({ f, today }: { f: FridgeItem; today: ISODate }) {
   const adjust = useAppStore((s) => s.adjustFridge)
   const restoreTub = useAppStore((s) => s.restoreTub)
-  const status = f.freeze ? (
-    <Chip tone="ice" icon={<Snowflake />}>
-      морозилка
-    </Chip>
-  ) : f.until < today ? (
-    <Chip tone="bad">просрочено</Chip>
-  ) : f.until === today ? (
-    <Chip tone="warn">съесть сегодня</Chip>
-  ) : (
-    <Chip tone="ok">до {untilDay(today, f.until)}</Chip>
-  )
   const name = BATCH_NAMES[f.key]
+  const status = f.freeze
+    ? { text: 'в морозилке', cls: 'text-ice', icon: <Snowflake className="size-3.5" aria-hidden /> }
+    : f.until < today
+      ? { text: 'просрочено', cls: 'text-bad', icon: null }
+      : f.until === today
+        ? { text: 'съесть сегодня', cls: 'text-warn', icon: null }
+        : { text: `хранится до ${untilDay(today, f.until)}`, cls: 'text-muted-foreground', icon: null }
   return (
-    <div className="relative flex min-w-0 flex-col gap-2 rounded-[18px_18px_14px_14px] border border-line bg-surface px-3 pt-7 pb-3 shadow-[var(--shadow-card)]">
+    <div className="relative flex min-w-0 flex-col rounded-[14px_14px_18px_18px] bg-surface px-3.5 pt-8 pb-3 shadow-[var(--shadow-card)] dark:border dark:border-line">
       {/* Крышка */}
-      <div aria-hidden className="absolute inset-x-2 -top-[5px] h-[9px] rounded-t-[10px] rounded-b-[3px] border border-line bg-surface-2" />
-      <div
-        className="tape absolute top-1 left-2.5 max-w-[calc(100%-20px)] -rotate-[2.5deg] truncate px-3 pt-0.5 text-[21px] leading-[1.15] font-bold"
-        aria-label={`Приготовлено ${dayMonth(f.cooked)}`}
-      >
+      <div aria-hidden className="absolute inset-x-1.5 -top-1.5 h-3 rounded-[8px] bg-surface-3" />
+      <Tape className="absolute top-0 left-2.5 max-w-[calc(100%-20px)] truncate text-[20px]" label={`Приготовлено ${dayMonth(f.cooked)}`}>
         {DW[weekday(f.cooked)]} {dayMonth(f.cooked)}
+      </Tape>
+      <div className="text-[15px] leading-snug font-semibold">{name}</div>
+      <div className={cn('mt-1 flex items-center gap-1 text-[12.5px] font-medium', status.cls)}>
+        {status.icon}
+        {status.text}
       </div>
-      <div className="mt-2 leading-snug font-semibold">{name}</div>
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="font-display text-[22px] leading-none font-semibold">×{f.n}</span>
-        {status}
-      </div>
-      <div className="mt-auto grid grid-cols-2 gap-2 pt-1">
+      <div className="mt-3 flex items-center justify-between">
         <button
           type="button"
-          aria-label={`Убрать одну порцию: ${name}`}
+          aria-label={`Убрать порцию: ${name}`}
           onClick={() => {
             adjust(f.id, -1)
             if (f.n === 1) toast(`Убрано: ${name}`, { action: { label: 'Вернуть', onClick: () => restoreTub(f) } })
           }}
-          className="grid h-11 place-items-center rounded-xl bg-surface-2 active:bg-surface-3"
+          className="relative grid size-9 place-items-center rounded-full bg-surface-2 after:absolute after:-inset-1 active:bg-surface-3"
         >
-          <Minus className="size-5" aria-hidden />
+          <Minus className="size-4" aria-hidden />
         </button>
+        <span className="font-display text-[24px] leading-none font-light">
+          ×{f.n}
+          <span className="sr-only"> {plural(f.n, ['порция', 'порции', 'порций'])}</span>
+        </span>
         <button
           type="button"
           aria-label={`Добавить порцию: ${name}`}
           onClick={() => adjust(f.id, 1)}
-          className="grid h-11 place-items-center rounded-xl bg-surface-2 active:bg-surface-3"
+          className="relative grid size-9 place-items-center rounded-full bg-surface-2 after:absolute after:-inset-1 active:bg-surface-3"
         >
-          <Plus className="size-5" aria-hidden />
+          <Plus className="size-4" aria-hidden />
         </button>
       </div>
     </div>
   )
 }
 
-/* ---------- Кладовка ---------- */
+/* ---------- Кладовка: сверка количества, прогноз и бакалея ---------- */
 
 function Pantry() {
   const today = useToday()
@@ -147,32 +146,32 @@ function Pantry() {
   const staples = ids.filter((id) => PRODUCTS[id].staple)
 
   return (
-    <div className="flex flex-col gap-5">
-      <p className="text-[14.5px] text-muted-foreground">Это и есть сверка: если дома продукта больше или меньше, просто поправь число.</p>
+    <div className="flex flex-col gap-6">
+      <p className="px-1 text-[14.5px] leading-snug text-muted-foreground">Это и есть сверка: если дома продукта больше или меньше, поправь число.</p>
       {CATEGORIES.map((cat, ci) => {
         const list = ids.filter((id) => PRODUCTS[id].cat === ci && !PRODUCTS[id].staple)
         if (!list.length) return null
         return (
           <section key={cat} className="flex flex-col gap-2">
-            <Eyebrow>{cat}</Eyebrow>
-            <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
+            <GroupLabel>{cat}</GroupLabel>
+            <Group>
               {list.map((id) => {
                 const p = PRODUCTS[id]
                 const st = fc.status[id]
                 const ice = fc.freezer[id]
                 return (
-                  <li key={id} className="flex items-center gap-3 py-2 pr-2 pl-4">
-                    <div className="min-w-0 flex-1 py-1">
-                      <div className="leading-snug font-semibold">{p.name}</div>
-                      <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13.5px]">
+                  <li key={id} className="flex items-center gap-3 py-2.5 pr-2.5 pl-4">
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[16px] leading-snug font-medium">{p.name}</div>
+                      <div className="mt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[13px] font-medium">
                         {st?.kind === 'shortToday' && <span className="text-bad">не хватает уже сегодня</span>}
                         {st?.kind === 'shortOn' && <span className="text-warn">закончится {relDay(today, st.date)}</span>}
                         {st?.kind === 'enough' && <span className="text-ok">хватит на неделю</span>}
-                        {st?.kind === 'unused' && <span className="text-muted-foreground">на этой неделе не нужен</span>}
+                        {st?.kind === 'unused' && <span className="font-normal text-muted-foreground">на этой неделе не нужен</span>}
                         {ice && (
-                          <Chip tone="ice" icon={<Snowflake />}>
-                            в морозилку · нужно {relDay(today, ice)}
-                          </Chip>
+                          <span className="inline-flex items-center gap-1 text-ice">
+                            <Snowflake className="size-3.5" aria-hidden />в морозилку, нужно {relDay(today, ice)}
+                          </span>
                         )}
                       </div>
                     </div>
@@ -180,28 +179,27 @@ function Pantry() {
                   </li>
                 )
               })}
-            </ul>
+            </Group>
           </section>
         )
       })}
 
       <section className="flex flex-col gap-2">
-        <Eyebrow>Соусы, специи, бакалея</Eyebrow>
-        <p className="text-[13.5px] text-muted-foreground">Граммы тут не считаем. Нажми, когда что-то кончается, и оно попадёт в покупки.</p>
-        <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
+        <GroupLabel>Соусы, специи, бакалея</GroupLabel>
+        <Group>
           {staples.map((id) => {
             const low = data.staples[id] === 'low'
             return (
-              <li key={id} className="flex min-h-14 items-center gap-3 py-1.5 pr-2 pl-4">
-                <div className="min-w-0 flex-1 font-semibold">{PRODUCTS[id].name}</div>
+              <li key={id} className="flex min-h-[52px] items-center gap-3 py-1.5 pr-2.5 pl-4">
+                <div className="min-w-0 flex-1 text-[16px] font-medium">{PRODUCTS[id].name}</div>
                 <button
                   type="button"
                   aria-pressed={low}
                   aria-label={`${PRODUCTS[id].name}: ${low ? 'заканчивается' : 'есть'}`}
                   onClick={() => toggleStaple(id)}
                   className={cn(
-                    'h-11 min-w-[132px] rounded-xl px-3 text-[14px] font-semibold transition-colors',
-                    low ? 'bg-warn/15 text-warn' : 'bg-surface-2 text-ink-2',
+                    'relative h-9 min-w-[124px] rounded-full px-3 text-[13.5px] font-semibold transition-colors duration-[175ms] after:absolute after:-inset-y-1 after:inset-x-0',
+                    low ? 'bg-warn/14 text-warn' : 'bg-surface-2 text-ink-2',
                   )}
                 >
                   {low ? 'заканчивается' : 'есть'}
@@ -209,7 +207,8 @@ function Pantry() {
               </li>
             )
           })}
-        </ul>
+        </Group>
+        <p className="px-1 text-[13px] leading-snug text-muted-foreground">Граммы тут не считаем. Нажми, когда что-то кончается, и оно попадёт в покупки.</p>
       </section>
     </div>
   )

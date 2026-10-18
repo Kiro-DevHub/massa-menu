@@ -145,10 +145,10 @@ export default function CookScreen(props: Props) {
               dragConstraints={{ left: 0, right: 0 }}
               dragElastic={0.2}
               onDragEnd={onDragEnd}
-              className="flex h-full touch-pan-y flex-col justify-center gap-7 py-8"
+              className="flex h-full touch-pan-y flex-col justify-center gap-6 pt-6 pb-24"
               aria-label={`Шаг ${i + 1} из ${total}`}
             >
-              <div className="font-display text-[56px] leading-none font-semibold text-saffron-ink">{i + 1}</div>
+              <div className="font-display text-[88px] leading-[0.85] font-light tracking-[-0.05em] text-saffron-ink">{i + 1}</div>
               <p className="text-[24px] leading-[1.4] font-medium text-pretty">{step.text}</p>
               <TimerButton step={step} size="lg" />
             </motion.section>
@@ -160,7 +160,7 @@ export default function CookScreen(props: Props) {
             type="button"
             onClick={() => go(i - 1)}
             disabled={i === 0}
-            className="inline-flex h-14 flex-1 items-center justify-center gap-1 rounded-2xl bg-surface-2 text-[17px] font-semibold disabled:opacity-40"
+            className="inline-flex h-14 flex-1 items-center justify-center gap-1 rounded-[18px] bg-surface text-[17px] font-semibold shadow-[var(--shadow-card)] disabled:opacity-40 dark:border dark:border-line"
           >
             <ChevronLeft className="size-5" aria-hidden />
             Назад
@@ -169,13 +169,13 @@ export default function CookScreen(props: Props) {
             <button
               type="button"
               onClick={() => go(i + 1)}
-              className="inline-flex h-14 flex-[1.4] items-center justify-center gap-1 rounded-2xl bg-saffron text-[17px] font-semibold text-on-saffron"
+              className="inline-flex h-14 flex-[1.4] items-center justify-center gap-1 rounded-[18px] bg-saffron text-[17px] font-semibold text-on-saffron"
             >
               Дальше
               <ChevronRight className="size-5" aria-hidden />
             </button>
           ) : (
-            <button type="button" onClick={() => navigate(back)} className="inline-flex h-14 flex-[1.4] items-center justify-center rounded-2xl bg-ink text-[17px] font-semibold text-bg">
+            <button type="button" onClick={() => navigate(back)} className="inline-flex h-14 flex-[1.4] items-center justify-center rounded-[18px] bg-ink text-[17px] font-semibold text-bg">
               Готово
             </button>
           )}

@@ -62,7 +62,7 @@ export function ExtraFoodDrawer({ date, open, onOpenChange }: { date: ISODate; o
           </DrawerDescription>
         </DrawerHeader>
         <div className="overflow-y-auto px-5 pb-5">
-          <ul className="flex flex-col divide-y divide-line overflow-hidden rounded-2xl border border-line">
+          <ul className="flex flex-col divide-y divide-line overflow-hidden rounded-[20px] bg-surface-2/60">
             {PRESETS.map((p) => (
               <li key={p.name}>
                 <button type="button" onClick={() => add(p)} className="flex min-h-14 w-full items-center gap-3 px-4 py-2.5 text-left active:bg-surface-2">
@@ -77,7 +77,7 @@ export function ExtraFoodDrawer({ date, open, onOpenChange }: { date: ISODate; o
           </ul>
 
           <form onSubmit={submit} className="mt-6 flex flex-col gap-3" noValidate>
-            <h3 className="font-display text-[16px] font-semibold">Свой вариант</h3>
+            <h3 className="text-[17px] font-semibold">Свой вариант</h3>
             {field('name', 'Что съел', { placeholder: 'Например, плов у бабушки', maxLength: 60, autoComplete: 'off', enterKeyHint: 'next' })}
             <div className="grid grid-cols-4 gap-2">
               {field('k', 'Ккал', { inputMode: 'numeric' })}

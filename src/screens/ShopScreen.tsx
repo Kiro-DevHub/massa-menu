@@ -1,18 +1,32 @@
-import { ShoppingBag, Snowflake, Undo2 } from 'lucide-react'
+import { Check, Info, ShoppingBasket, Snowflake } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { PRODUCTS, type ProductId } from '@/data'
-import { TopRow } from '@/components/AppShell'
-import { Chip, EmptyState, Eyebrow, Note, PageTitle, SectionTitle } from '@/components/common'
+import { EmptyState, Group, GroupLabel, Note, ScreenHeader, SectionTitle } from '@/components/common'
 import { QtyInput } from '@/components/QtyInput'
-import { Button } from '@/components/ui/button'
-import { addDays, dateLong, relDay, untilDay, type ISODate } from '@/logic/dates'
+import { addDays, dateLong, relDay, untilDay } from '@/logic/dates'
 import { fmtQ } from '@/logic/format'
 import { roundBuy, shopFreezerHint, shopping, type Shopping } from '@/logic/shopping'
 import { useAppStore } from '@/store/app-store'
 import { useToday } from '@/store/hooks'
 
 const byCategory = (ids: ProductId[]) => ids.sort((a, b) => PRODUCTS[a].cat - PRODUCTS[b].cat)
+
+/** Круглая отметка в начале строки, как в списке покупок. */
+function BuyCheck({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      onClick={onClick}
+      className="group grid size-11 flex-none place-items-center rounded-full active:bg-surface-2"
+    >
+      <span className="grid size-[26px] place-items-center rounded-full border-2 border-muted-foreground/45 text-transparent transition-colors duration-[175ms] group-hover:border-saffron group-active:border-saffron group-active:bg-saffron group-active:text-on-saffron">
+        <Check className="size-4" strokeWidth={3} aria-hidden />
+      </span>
+    </button>
+  )
+}
 
 export default function ShopScreen() {
   const today = useToday()
@@ -30,101 +44,90 @@ export default function ShopScreen() {
   const nothing = !urgent.length && !trip.length && !sh.lowStaples.length
 
   return (
-    <>
-      <TopRow />
-      <PageTitle title="Покупки" sub="Закупки по воскресеньям и средам. Список считается сам: меню минус то, что уже лежит дома." />
+    <div className="flex flex-col gap-7">
+      <ScreenHeader title="Покупки" sub="Меню минус то, что уже дома. Закупки по воскресеньям и средам." />
 
       {emptyPantry && !nothing && (
-        <Note className="mt-4">
-          <span className="font-semibold">Первый запуск: кладовка пуста, поэтому в списке всё.</span> Купи по списку и жми «Купил» у каждой позиции. Если что-то уже есть дома,
-          впиши это в «Склад → Кладовка».
+        <Note icon={<Info />}>
+          <b className="font-semibold">Кладовка пуста, поэтому в списке всё.</b> Отмечай кружком купленное. Что уже есть дома, впиши в «Склад», раздел «Кладовка».
         </Note>
       )}
 
-      <div className="mt-5 flex flex-col gap-6">
-        {!tripToday && urgent.length > 0 && (
-          <Group title={`Нужно до ${untilDay(today, sh.trip)}`} sub={`Этого не хватит уже до ближайшей закупки ${relDay(today, sh.trip)}.`}>
+      {!tripToday && urgent.length > 0 && (
+        <section className="flex flex-col gap-3">
+          <SectionTitle sub={`Этого не хватит уже до закупки ${relDay(today, sh.trip)}.`}>Нужно до {untilDay(today, sh.trip)}</SectionTitle>
+          <Group>
             {urgent.map((id) => (
-              <BuyRow key={`u-${id}-${sh.urgentDef[id]}`} id={id} need={sh.urgentDef[id]!} sh={sh} today={today} />
+              <BuyRow key={`u-${id}-${sh.urgentDef[id]}`} id={id} need={sh.urgentDef[id]!} sh={sh} />
             ))}
           </Group>
-        )}
+        </section>
+      )}
 
-        {trip.length > 0 && (
-          <Group
-            title={tripToday ? 'Закупка сегодня' : `Закупка ${relDay(today, sh.trip)}, ${dateLong(sh.trip)}`}
-            sub={`Хватит до ${untilDay(today, lastDay)} включительно, следующая закупка ${relDay(today, sh.after)}.`}
-          >
+      {trip.length > 0 && (
+        <section className="flex flex-col gap-3">
+          <SectionTitle sub={`Хватит до ${untilDay(today, lastDay)} включительно, следующая закупка ${relDay(today, sh.after)}.`}>
+            {tripToday ? 'Закупка сегодня' : `Закупка ${relDay(today, sh.trip)}, ${dateLong(sh.trip)}`}
+          </SectionTitle>
+          <Group>
             {trip.map((id) => (
-              <BuyRow key={`t-${id}-${sh.tripDef[id]}`} id={id} need={sh.tripDef[id]!} sh={sh} today={today} />
+              <BuyRow key={`t-${id}-${sh.tripDef[id]}`} id={id} need={sh.tripDef[id]!} sh={sh} />
             ))}
           </Group>
-        )}
+        </section>
+      )}
 
-        {sh.lowStaples.length > 0 && (
-          <Group title="Заканчивается" sub="Бакалея, которую ты отметил на складе.">
+      {sh.lowStaples.length > 0 && (
+        <section className="flex flex-col gap-3">
+          <SectionTitle sub="Бакалея, которую ты отметил на складе.">Заканчивается</SectionTitle>
+          <Group>
             {sh.lowStaples.map((id) => (
-              <li key={id} className="flex min-h-14 items-center gap-3 py-1.5 pr-2 pl-4">
-                <div className="min-w-0 flex-1 font-semibold">{PRODUCTS[id].name}</div>
-                <Button
-                  variant="secondary"
+              <li key={id} className="flex min-h-[52px] items-center gap-1 py-1 pr-4 pl-1.5">
+                <BuyCheck
+                  label={`Купил: ${PRODUCTS[id].name}`}
                   onClick={() => {
                     stapleBought(id)
                     toast(`Куплено: ${PRODUCTS[id].name}`, { action: { label: 'Отменить', onClick: () => toggleStaple(id) } })
                   }}
-                >
-                  Купил
-                </Button>
+                />
+                <div className="min-w-0 flex-1 text-[16px] font-medium">{PRODUCTS[id].name}</div>
               </li>
             ))}
           </Group>
-        )}
+        </section>
+      )}
 
-        {nothing && (
-          <EmptyState icon={<ShoppingBag />} title={`Всё есть до ${untilDay(today, lastDay)} включительно`}>
-            Можно в магазин не ходить. Список обновится сам, когда что-то начнёт заканчиваться.
-          </EmptyState>
-        )}
+      {nothing && (
+        <EmptyState icon={<ShoppingBasket />} title={`Всё есть до ${untilDay(today, lastDay)} включительно`}>
+          В магазин можно не ходить. Список обновится сам, когда что-то начнёт заканчиваться.
+        </EmptyState>
+      )}
 
-        {recent.length > 0 && (
-          <section className="flex flex-col gap-2">
-            <Eyebrow>Недавно добавлено в кладовку</Eyebrow>
-            <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
-              {recent.map((b) => (
-                <li key={b.id} className="flex items-center gap-3 py-1.5 pr-1.5 pl-4">
-                  <div className="min-w-0 flex-1 py-1">
-                    <div className="font-semibold">{PRODUCTS[b.prod].name}</div>
-                    <div className="num text-[13.5px] text-muted-foreground">
-                      {fmtQ(b.qty, PRODUCTS[b.prod].unit)} · {relDay(today, b.date)}
-                    </div>
+      {recent.length > 0 && (
+        <section className="flex flex-col gap-2">
+          <GroupLabel>Недавно добавлено в кладовку</GroupLabel>
+          <Group>
+            {recent.map((b) => (
+              <li key={b.id} className="flex items-center gap-3 py-1.5 pr-1.5 pl-4">
+                <div className="min-w-0 flex-1 py-1">
+                  <div className="text-[15px] font-medium">{PRODUCTS[b.prod].name}</div>
+                  <div className="num text-[13px] text-muted-foreground">
+                    +{fmtQ(b.qty, PRODUCTS[b.prod].unit)}, {relDay(today, b.date)}
                   </div>
-                  <Button variant="ghost" onClick={() => unbuy(b.id)} className="text-muted-foreground">
-                    <Undo2 aria-hidden />
-                    Отменить
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-      </div>
-    </>
+                </div>
+                <button type="button" onClick={() => unbuy(b.id)} className="h-11 rounded-[12px] px-3 text-[14px] font-medium text-ink-2 active:bg-surface-2">
+                  Отменить
+                </button>
+              </li>
+            ))}
+          </Group>
+        </section>
+      )}
+    </div>
   )
 }
 
-function Group({ title, sub, children }: { title: string; sub: string; children: React.ReactNode }) {
-  return (
-    <section className="flex flex-col gap-2">
-      <div>
-        <SectionTitle className="min-h-0">{title}</SectionTitle>
-        <p className="mt-1 text-[14px] text-muted-foreground">{sub}</p>
-      </div>
-      <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">{children}</ul>
-    </section>
-  )
-}
-
-function BuyRow({ id, need, sh, today }: { id: ProductId; need: number; sh: Shopping; today: ISODate }) {
+function BuyRow({ id, need, sh }: { id: ProductId; need: number; sh: Shopping }) {
   const buy = useAppStore((s) => s.buy)
   const unbuy = useAppStore((s) => s.unbuy)
   const have = useAppStore((s) => s.data.pantry[id] ?? 0)
@@ -140,23 +143,22 @@ function BuyRow({ id, need, sh, today }: { id: ProductId; need: number; sh: Shop
   }
 
   return (
-    <li className="flex items-center gap-2 py-2 pr-2 pl-4">
-      <div className="min-w-0 flex-1 py-1">
-        <div className="leading-snug font-semibold">{p.name}</div>
-        <div className="num mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13.5px] text-muted-foreground">
-          <span>не хватает {fmtQ(need, p.unit)}</span>
+    <li className="flex items-center gap-1 py-2 pr-2.5 pl-1.5">
+      <BuyCheck label={`Купил: ${p.name}, ${fmtQ(qty, p.unit)}`} onClick={onBuy} />
+      <div className="min-w-0 flex-1 py-0.5">
+        <div className="text-[16px] leading-snug font-medium">{p.name}</div>
+        <div className="num mt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[13px] text-muted-foreground">
+          <span>нужно {fmtQ(need, p.unit)}</span>
           {have > 0 && <span>дома {fmtQ(have, p.unit)}</span>}
           {ice && (
-            <Chip tone="ice" icon={<Snowflake />}>
-              {`дома сразу в морозилку · нужно ${relDay(today, ice)}`}
-            </Chip>
+            <span className="inline-flex items-center gap-1 font-medium text-ice">
+              <Snowflake className="size-3.5" aria-hidden />
+              сразу в морозилку
+            </span>
           )}
         </div>
       </div>
-      <QtyInput value={qty} unit={p.unit} label={`Сколько купил: ${p.name}`} onCommit={setQty} className="gap-1" />
-      <Button variant="secondary" onClick={onBuy} className="px-3.5">
-        Купил
-      </Button>
+      <QtyInput value={qty} unit={p.unit} label={`Сколько купить: ${p.name}`} onCommit={setQty} className="ml-2" />
     </li>
   )
 }
