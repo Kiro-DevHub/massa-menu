@@ -16,9 +16,19 @@ export interface Usage {
   fridge: FridgeItem[]
 }
 
+/**
+ * Что было в тарелке в момент отметки. История дня рендерится из снапшота,
+ * поэтому смена меню не переписывает прошлые дни. У записей до v2 снапшота может не быть.
+ */
+export interface MealSnapshot extends Macros {
+  /** Id рецепта на момент отметки (может уже не существовать в справочнике). */
+  rid: string
+  name: string
+}
+
 export type SlotEntry =
-  | { st: 'eaten'; use: Usage; from: 'fridge' | 'fresh' }
-  | { st: 'skipped' }
+  | { st: 'eaten'; use: Usage; from: 'fridge' | 'fresh'; meal?: MealSnapshot }
+  | { st: 'skipped'; meal?: MealSnapshot }
 
 export interface Extra extends Macros {
   id: string

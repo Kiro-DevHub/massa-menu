@@ -1,8 +1,8 @@
 import { SESSIONS, SLOTS, type Macros, type ProductId, type SessionId, type Slot } from '@/data'
 import type { ISODate } from './dates'
-import { recipeAt } from './menu'
+import { recipeAt, recipeIdAt } from './menu'
 import { rawFor } from './stock'
-import type { AppData } from './types'
+import type { AppData, MealSnapshot } from './types'
 
 const zero = (): Macros => ({ k: 0, p: 0, f: 0, c: 0 })
 const add = (t: Macros, m: Macros) => {
@@ -19,12 +19,24 @@ export function dayPlan(date: ISODate): Macros {
   return t
 }
 
-/** Съедено за день: отмеченные приёмы и еда вне меню. */
+/**
+ * Что было отмечено в приёме: снапшот из лога, а для записей без снапшота — блюдо из текущего меню.
+ * Так смена меню не меняет прошлые дни.
+ */
+export function loggedMeal(data: AppData, date: ISODate, slot: Slot): MealSnapshot {
+  const snap = data.log[date]?.slots[slot]?.meal
+  if (snap) return snap
+  const rid = recipeIdAt(date, slot)
+  const r = recipeAt(date, slot)
+  return { rid, name: r.name, k: r.k, p: r.p, f: r.f, c: r.c }
+}
+
+/** Съедено за день: отмеченные приёмы (по снапшоту) и еда вне меню. */
 export function dayEaten(data: AppData, date: ISODate): Macros {
   const t = zero()
   const L = data.log[date]
   if (!L) return t
-  for (const sl of SLOTS) if (L.slots[sl.key]?.st === 'eaten') add(t, recipeAt(date, sl.key))
+  for (const sl of SLOTS) if (L.slots[sl.key]?.st === 'eaten') add(t, loggedMeal(data, date, sl.key))
   for (const x of L.extras) add(t, x)
   return t
 }

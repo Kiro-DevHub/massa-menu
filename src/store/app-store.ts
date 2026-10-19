@@ -4,6 +4,7 @@ import { createJSONStorage, persist, type StateStorage } from 'zustand/middlewar
 import type { ProductId, SessionId, Slot } from '@/data'
 import { defaultSettings, SCHEMA_VERSION, type Settings, type Theme } from '@/logic/backup'
 import { todayISO, type ISODate } from '@/logic/dates'
+import { migratePersistedV1 } from '@/logic/migrate'
 import { prune } from '@/logic/prune'
 import * as stock from '@/logic/stock'
 import { emptyData, uid, type AppData, type Extra, type FridgeItem } from '@/logic/types'
@@ -58,8 +59,11 @@ const idbStorage: StateStorage = {
 
 type Persisted = Pick<AppState, 'data' | 'settings' | 'timers'>
 
-/** Миграции схемы: ключ — версия, из которой мигрируем. Пока схема одна. */
-const MIGRATIONS: Record<number, (s: Persisted) => Persisted> = {}
+/** Миграции схемы: ключ — версия, из которой мигрируем. */
+const MIGRATIONS: Record<number, (s: Persisted) => Persisted> = {
+  // v1 → v2: замена четырёх блюд и снапшоты съеденного в логе.
+  1: migratePersistedV1,
+}
 
 export const STORAGE_KEY = 'massa-menu'
 

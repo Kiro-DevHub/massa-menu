@@ -1,4 +1,5 @@
-// Перенесено 1-в-1 из reference/menu-reference.html. Паритет проверяет src/data/data-parity.test.ts.
+// Перенесено 1-в-1 из reference/menu-reference.html. После замены четырёх блюд добавлены сметана и карри,
+// убраны говядина и куриный фарш. Паритет проверяет src/data/data-parity.test.ts.
 import type { Product } from './types'
 
 export const CATEGORIES = ["Мясо и рыба", "Крупы и макароны", "Хлеб и лаваш", "Молочка и яйца", "Фрукты и овощи", "Перекусы и напитки", "Соусы и бакалея"] as const
@@ -6,8 +7,6 @@ export const CATEGORIES = ["Мясо и рыба", "Крупы и макарон
 const PRODUCT_DATA = {
   chicken: { name: "Куриная грудка", unit: "г", cat: 0, meat: true, step: 50 },
   beefMince: { name: "Говяжий фарш 10%", unit: "г", cat: 0, meat: true, step: 50 },
-  beef: { name: "Говядина (лопатка)", unit: "г", cat: 0, meat: true, step: 50 },
-  chickenMince: { name: "Куриный фарш", unit: "г", cat: 0, meat: true, step: 50 },
   pork: { name: "Свиная вырезка", unit: "г", cat: 0, meat: true, step: 50 },
   salmon: { name: "Горбуша, филе", unit: "г", cat: 0, meat: true, step: 50 },
   ham: { name: "Ветчина", unit: "г", cat: 0, pack: 200 },
@@ -24,6 +23,7 @@ const PRODUCT_DATA = {
   cottage: { name: "Творог 5%", unit: "г", cat: 3, pack: 200 },
   creamCheese: { name: "Творожный сыр", unit: "г", cat: 3, pack: 140 },
   cream: { name: "Сливки 10%", unit: "мл", cat: 3, pack: 200 },
+  sourCream: { name: "Сметана 10%", unit: "г", cat: 3, pack: 300 },
   plainYogurt: { name: "Йогурт без добавок (для соуса)", unit: "г", cat: 3, pack: 250 },
   banana: { name: "Бананы", unit: "шт", cat: 4, pack: 1 },
   apple: { name: "Яблоки", unit: "шт", cat: 4, pack: 1 },
@@ -43,6 +43,7 @@ const PRODUCT_DATA = {
   flour: { name: "Мука", unit: "г", cat: 6, staple: true },
   sugar: { name: "Сахар", unit: "г", cat: 6, staple: true },
   spices: { name: "Соль и специи", cat: 6, staple: true },
+  curry: { name: "Карри", cat: 6, staple: true },
   onion: { name: "Лук", cat: 4, staple: true },
   garlic: { name: "Чеснок", cat: 4, staple: true },
   lemon: { name: "Лимон", cat: 4, staple: true },

@@ -48,7 +48,7 @@ describe('КБЖУ дня', () => {
 describe('заготовка: понадобится', () => {
   it('сумма batch-ингредиентов и extra', () => {
     const n = Object.fromEntries(sessionNeeds('tue').map((x) => [x.id, x.q]))
-    expect(n).toMatchObject({ beef: 240, rice: 240, beefMince: 240, bulgur: 200, salmon: 60 })
+    expect(n).toMatchObject({ pork: 260, rice: 220, sourCream: 80, beefMince: 240, bulgur: 200, salmon: 60 })
     expect(n.lavash).toBeUndefined() // подаётся свежим
   })
 })

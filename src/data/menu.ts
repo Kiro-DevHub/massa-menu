@@ -1,4 +1,4 @@
-// Перенесено 1-в-1 из reference/menu-reference.html. Паритет проверяет src/data/data-parity.test.ts.
+// Перенесено 1-в-1 из reference/menu-reference.html, кроме четырёх заменённых блюд (без духовки и долгой готовки).
 import type { DayMenu, SlotInfo } from './types'
 
 export const SLOTS = [
@@ -12,10 +12,10 @@ export const SLOTS = [
 /** Меню по дням недели, 0 = понедельник. */
 export const MENU = [
   { b: "omeletCheese", l: "snMon", d: "teriyaki", p: "shake", s: "bolognese" },
-  { b: "roll", l: "snTue", d: "teriyaki", p: "shake", s: "salmon" },
-  { b: "syrnikiCond", l: "snWed", d: "bolognese", p: "shake", s: "goulash" },
-  { b: "toastSalmon", l: "snThu", d: "lula", p: "shake", s: "goulash" },
-  { b: "french", l: "snFri", d: "lula", p: "shake", s: "meatballs" },
+  { b: "roll", l: "snTue", d: "teriyaki", p: "shake", s: "salmonPan" },
+  { b: "syrnikiCond", l: "snWed", d: "bolognese", p: "shake", s: "stroganoff" },
+  { b: "toastSalmon", l: "snThu", d: "kebabmince", p: "shake", s: "stroganoff" },
+  { b: "french", l: "snFri", d: "kebabmince", p: "shake", s: "curry" },
   { b: "syrnikiNut", l: "snSat", d: "creamy", p: "shake", s: "shawarma" },
-  { b: "omeletHam", l: "snSun", d: "meatballs", p: "shake", s: "wok" },
+  { b: "omeletHam", l: "snSun", d: "curry", p: "shake", s: "wok" },
 ] as const satisfies readonly DayMenu[]

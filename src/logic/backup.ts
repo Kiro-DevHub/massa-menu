@@ -1,7 +1,8 @@
 import { BATCH_NAMES, PRODUCTS, SESSIONS, SLOTS, type BatchKey, type ProductId, type SessionId, type Slot } from '@/data'
 import type { ISODate } from './dates'
 import { sortFridge } from './stock'
-import { emptyData, type AppData, type DayLog, type Extra, type FridgeItem, type SlotEntry, type Usage } from './types'
+import { migrateDataV1toV2 } from './migrate'
+import { emptyData, type AppData, type DayLog, type Extra, type FridgeItem, type MealSnapshot, type SlotEntry, type Usage } from './types'
 
 export type Theme = 'auto' | 'light' | 'dark'
 export interface Settings {
@@ -12,7 +13,8 @@ export interface Settings {
 export const defaultSettings = (): Settings => ({ theme: 'light' })
 
 export const BACKUP_APP = 'massa-menu'
-export const SCHEMA_VERSION = 1
+/** v2: заменены четыре блюда, в логе появился снапшот съеденного. Миграция в logic/migrate.ts. */
+export const SCHEMA_VERSION = 2
 
 export interface BackupFile {
   app: typeof BACKUP_APP
@@ -66,6 +68,12 @@ function extra(x: unknown): Extra | null {
   return { id: typeof x.id === 'string' ? x.id : Math.random().toString(36).slice(2, 10), name, k: x.k, p: isNum(x.p) ? x.p : 0, f: isNum(x.f) ? x.f : 0, c: isNum(x.c) ? x.c : 0 }
 }
 
+function meal(x: unknown): MealSnapshot | null {
+  if (!isObj(x) || typeof x.rid !== 'string' || typeof x.name !== 'string') return null
+  if (!isNum(x.k) || !isNum(x.p) || !isNum(x.f) || !isNum(x.c)) return null
+  return { rid: x.rid, name: x.name, k: x.k, p: x.p, f: x.f, c: x.c }
+}
+
 function dayLog(x: unknown): DayLog {
   const L: DayLog = { slots: {}, extras: [], sessions: {} }
   if (!isObj(x)) return L
@@ -73,8 +81,10 @@ function dayLog(x: unknown): DayLog {
     for (const [k, v] of Object.entries(x.slots)) {
       if (!isSlot(k) || !isObj(v)) continue
       let e: SlotEntry | null = null
+      const m = meal(v.meal)
       if (v.st === 'skipped') e = { st: 'skipped' }
       else if (v.st === 'eaten') e = { st: 'eaten', use: usage(v.use), from: v.from === 'fridge' ? 'fridge' : 'fresh' }
+      if (e && m) e.meal = m
       if (e) L.slots[k] = e
     }
   if (Array.isArray(x.extras)) L.extras = x.extras.map(extra).filter((e): e is Extra => !!e)
@@ -123,9 +133,11 @@ export function parseBackup(text: string): ParsedBackup {
     if (!isObj(raw.data)) return { ok: false, error: 'В бэкапе нет данных.' }
     const theme = isObj(raw.settings) ? raw.settings.theme : undefined
     const settings: Settings | null = theme === 'auto' || theme === 'light' || theme === 'dark' ? { theme } : null
-    return { ok: true, data: normalizeData(raw.data), settings, source: 'app', exportedAt: typeof raw.exportedAt === 'string' ? raw.exportedAt : null }
+    // Бэкап старой схемы сначала проходит ту же миграцию, что и данные в хранилище.
+    const data = raw.schema < 2 ? migrateDataV1toV2(raw.data) : raw.data
+    return { ok: true, data: normalizeData(data), settings, source: 'app', exportedAt: typeof raw.exportedAt === 'string' ? raw.exportedAt : null }
   }
-  if (raw.v === 1 && ('pantry' in raw || 'log' in raw)) return { ok: true, data: normalizeData(raw), settings: null, source: 'prototype', exportedAt: null }
+  if (raw.v === 1 && ('pantry' in raw || 'log' in raw)) return { ok: true, data: normalizeData(migrateDataV1toV2(raw)), settings: null, source: 'prototype', exportedAt: null }
   return { ok: false, error: 'Файл не похож на бэкап «Меню на массу».' }
 }
 

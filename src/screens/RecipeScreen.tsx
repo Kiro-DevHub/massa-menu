@@ -2,7 +2,7 @@ import { AlertCircle, Check, ChefHat, Clock3, Lightbulb, Snowflake } from 'lucid
 import { useState } from 'react'
 import { Link } from 'wouter'
 import { toast } from 'sonner'
-import { PRODUCTS, SLOTS, type Recipe, type Slot } from '@/data'
+import { PRODUCTS, RECIPES, SLOTS, type Recipe, type RecipeId, type Slot } from '@/data'
 import { BackLink, Card, Chip, EmptyState, Group, Note, SectionTitle, Tape } from '@/components/common'
 import { SourceChip } from '@/components/SourceChip'
 import { StepsList } from '@/components/Steps'
@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { dayMonth, DW, DW_FULL, weekday, type ISODate } from '@/logic/dates'
 import { fmtDuration, fmtQ } from '@/logic/format'
-import { recipeAt, recipeIdAt } from '@/logic/menu'
+import { recipeIdAt } from '@/logic/menu'
 import { mealSource } from '@/logic/sources'
 import { isTracked } from '@/logic/stock'
 import type { AppData } from '@/logic/types'
@@ -51,13 +51,20 @@ function RecipeView({ date, slot }: { date: ISODate; slot: Slot }) {
   const undoMeal = useAppStore((s) => s.undoMeal)
   const skip = useAppStore((s) => s.skip)
   const [portions, setPortions] = useState(1)
-  const r = recipeAt(date, slot)
-  const rid = recipeIdAt(date, slot)
+  const entry0 = data.log[date]?.slots[slot]
+  // Для отмеченного приёма показываем то, что было съедено, если такой рецепт ещё есть.
+  const snapRid = entry0?.meal?.rid
+  const rid: RecipeId = snapRid && snapRid in RECIPES ? (snapRid as RecipeId) : recipeIdAt(date, slot)
+  const r = RECIPES[rid]
   const sl = SLOTS.find((s) => s.key === slot)!
   const entry = data.log[date]?.slots[slot]
   const mult = canScale(r) ? portions : 1
   const tub = r.batch ? data.fridge.filter((f) => f.key === r.batch).sort((a, b) => (a.cooked < b.cooked ? -1 : 1))[0] : undefined
   const back = date === today ? 'Сегодня' : DW_FULL[weekday(date)]
+  const src = mealSource(data, today, date, slot)
+  const tubExpired = !!tub && !tub.freeze && tub.until < today
+  // Порция берётся из контейнера: из кладовки нужно только то, что докладывается свежим.
+  const fromContainer = portions === 1 && (src.kind === 'fridge' || src.kind === 'freezer' || src.kind === 'fromSession')
 
   return (
     <div className="flex flex-col gap-7 pt-2">
@@ -71,7 +78,7 @@ function RecipeView({ date, slot }: { date: ISODate; slot: Slot }) {
           <Chip icon={<Clock3 />}>{r.time ? fmtDuration(r.time) : 'без готовки'}</Chip>
           {r.batch && <Chip>можно впрок</Chip>}
           {r.fresh && <Chip>только свежим</Chip>}
-          <SourceChip src={mealSource(data, today, date, slot)} today={today} />
+          <SourceChip src={src} today={today} />
         </div>
 
         <div className="mt-6 grid grid-cols-4 divide-x divide-line" aria-label="КБЖУ на порцию">
@@ -88,8 +95,14 @@ function RecipeView({ date, slot }: { date: ISODate; slot: Slot }) {
             {DW[weekday(tub.cooked)]} {dayMonth(tub.cooked)}
           </Tape>
           <div className="flex items-center gap-1.5 text-[14px] font-semibold">
-            {tub.freeze ? <Snowflake className="size-4 text-ice" aria-hidden /> : <Check className="size-4 text-ok" aria-hidden />}
-            {tub.freeze ? 'Есть в морозилке' : 'Есть в холодильнике'}
+            {tub.freeze ? (
+              <Snowflake className="size-4 text-ice" aria-hidden />
+            ) : tubExpired ? (
+              <AlertCircle className="size-4 text-bad" aria-hidden />
+            ) : (
+              <Check className="size-4 text-ok" aria-hidden />
+            )}
+            {tub.freeze ? 'Есть в морозилке' : tubExpired ? 'В холодильнике просроченная порция, лучше выбросить' : 'Есть в холодильнике'}
           </div>
           <p className="mt-1.5 text-[15px] leading-snug text-ink-2">{reheatText(r.reheat)}</p>
         </Card>
@@ -105,7 +118,7 @@ function RecipeView({ date, slot }: { date: ISODate; slot: Slot }) {
             </TabsList>
           </Tabs>
         )}
-        <Ingredients r={r} mult={mult} data={data} />
+        <Ingredients r={r} mult={mult} data={data} fromContainer={fromContainer} />
       </section>
 
       <section className="flex flex-col gap-3">
@@ -176,7 +189,8 @@ function Stat({ v, k, unit, className }: { v: number; k: string; unit?: string; 
   )
 }
 
-function Ingredients({ r, mult, data }: { r: Recipe; mult: number; data: AppData }) {
+function Ingredients({ r, mult, data, fromContainer }: { r: Recipe; mult: number; data: AppData; fromContainer: boolean }) {
+  const serve: readonly string[] = r.serve ?? []
   return (
     <Group>
       {r.ing.map((i) => {
@@ -191,6 +205,7 @@ function Ingredients({ r, mult, data }: { r: Recipe; mult: number; data: AppData
               подготовлено заранее
             </span>
           )
+        else if (fromContainer && !serve.includes(i.id)) status = <span className="text-muted-foreground">уже в контейнере</span>
         else if (!isTracked(i.id)) status = data.staples[i.id] === 'low' ? <span className="text-warn">заканчивается</span> : null
         else if (have >= q)
           status = (

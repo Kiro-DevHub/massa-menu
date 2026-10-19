@@ -66,7 +66,7 @@ describe('закупки', () => {
   it('отмеченная заранее заготовка не попадает в прогноз', () => {
     const before = shopping(data(), MON).urgentDef.beefMince
     // Заготовку вторника отметили в понедельник (окно −2…+1).
-    const d1 = markSession(data({ pantry: { beefMince: 500, beef: 500, rice: 500, bulgur: 500, salmon: 100 } }), MON, 'tue')
+    const d1 = markSession(data({ pantry: { beefMince: 500, pork: 500, sourCream: 300, rice: 500, bulgur: 500, salmon: 100 } }), MON, 'tue')
     expect(before).toBe(360)
     expect(shopping(d1, MON).urgentDef.beefMince).toBeUndefined()
   })
@@ -81,8 +81,11 @@ describe('закупки', () => {
 
 describe('морозилка', () => {
   it('мясо дома, первое использование через ≥ 2 дня — «в морозилку»', () => {
-    const f = pantryForecast(data({ pantry: { chicken: 1000 } }), WED)
-    expect(f.freezer.chicken).toBe(SAT) // курица нужна в субботу
+    // Заготовка вторника сделана: бефстроганов на среду и четверг уже в холодильнике.
+    const d = markSession(data({ pantry: { pork: 1000, chicken: 1000, sourCream: 300, rice: 1000 } }), TUE, 'tue')
+    const f = pantryForecast(d, WED)
+    expect(f.freezer.pork).toBe(SUN) // свинина нужна только к воскресному воку
+    expect(f.freezer.chicken).toBeUndefined() // курица уходит в заготовку карри уже в четверг
   })
   it('мясо, нужное завтра, не убираем в морозилку', () => {
     const f = pantryForecast(data({ pantry: { chicken: 1000 } }), FRI)
@@ -97,9 +100,10 @@ describe('морозилка', () => {
     expect(dayReminders(d1, FRI, FRI).some((x) => x.type === 'defrost')).toBe(false)
   })
   it('в списке покупок: мясо на дальний день — «дома сразу в морозилку»', () => {
-    const sh = shopping(data(), MON)
-    expect(shopFreezerHint(sh, 'pork')).toBe(SUN) // вок в воскресенье, закупка в среду
-    expect(shopFreezerHint(sh, 'chicken')).toBeNull() // нужна сегодня
+    // Закупка в среду: свинина после неё нужна только в воскресенье (вок), курица — уже в четверг.
+    const sh = shopping(markSession(data({ pantry: { pork: 500, sourCream: 300, rice: 1000 } }), TUE, 'tue'), WED)
+    expect(shopFreezerHint(sh, 'pork')).toBe(SUN)
+    expect(shopFreezerHint(sh, 'chicken')).toBeNull()
     expect(shopFreezerHint(sh, 'rice')).toBeNull() // не мясо
   })
 })
@@ -130,7 +134,7 @@ describe('откуда блюдо', () => {
     expect(mealSource(data(), MON, MON, 'l')).toEqual({ kind: 'noCook' })
     expect(mealSource(data(), MON, MON, 'p')).toEqual({ kind: 'afterGym' })
     expect(mealSource(data(), MON, TUE, 'p')).toEqual({ kind: 'quick' })
-    expect(mealSource(data(), MON, TUE, 's')).toEqual({ kind: 'fresh', minutes: 35 })
+    expect(mealSource(data(), MON, TUE, 's')).toEqual({ kind: 'fresh', minutes: 25 })
   })
   it('прошедший день без отметки', () => {
     expect(mealSource(data(), TUE, MON, 'd')).toEqual({ kind: 'past' })
@@ -151,8 +155,8 @@ describe('напоминания', () => {
   it('просрочено и «съесть сегодня»; морозилка не просрочивается', () => {
     const d = data({
       fridge: [
-        tub({ id: 'x', key: 'goulash', until: '2026-10-18' }),
-        tub({ id: 'y', key: 'lula', until: MON }),
+        tub({ id: 'x', key: 'stroganoff', until: '2026-10-18' }),
+        tub({ id: 'y', key: 'kebabmince', until: MON }),
         tub({ id: 'z', key: 'syrniki', until: '2026-10-01', freeze: true }),
       ],
     })

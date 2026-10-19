@@ -1,7 +1,7 @@
 import { PRODUCTS, RECIPES, SESSIONS, type BatchKey, type Ingredient, type ProductId, type RecipeId, type SessionId, type Slot } from '@/data'
 import { addDays, type ISODate } from './dates'
 import { recipeIdAt } from './menu'
-import { emptyDay, uid, type AppData, type DayLog, type Extra, type FridgeItem, type IdGen, type Usage } from './types'
+import { emptyDay, uid, type AppData, type DayLog, type Extra, type FridgeItem, type IdGen, type MealSnapshot, type Usage } from './types'
 
 const product = (id: ProductId) => PRODUCTS[id] as { staple?: true; meat?: true }
 export const isTracked = (id: ProductId) => !product(id).staple
@@ -36,6 +36,12 @@ export function fridgeMap(fridge: readonly FridgeItem[]): Partial<Record<BatchKe
 /** Холодильник всегда в одном порядке: старые порции первыми. Так отмена восстанавливает его точно. */
 export const sortFridge = (fridge: FridgeItem[]) =>
   fridge.sort((a, b) => (a.cooked < b.cooked ? -1 : a.cooked > b.cooked ? 1 : a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+
+/** Снапшот блюда для лога: id, название и КБЖУ на момент отметки. */
+export function snapshotOf(rid: RecipeId): MealSnapshot {
+  const r = RECIPES[rid]
+  return { rid, name: r.name, k: r.k, p: r.p, f: r.f, c: r.c }
+}
 
 const clone = (data: AppData): AppData => structuredClone(data)
 const dayLog = (data: AppData, date: ISODate): DayLog => (data.log[date] ??= emptyDay())
@@ -82,13 +88,13 @@ export function eatMeal(data0: AppData, date: ISODate, slot: Slot): AppData {
     raw = rawFor(rid, 'serve')
   } else raw = rawFor(rid, 'full')
   for (const i of raw) takePantry(data, i.id, i.q, use)
-  dayLog(data, date).slots[slot] = { st: 'eaten', use, from: use.fridge.length ? 'fridge' : 'fresh' }
+  dayLog(data, date).slots[slot] = { st: 'eaten', use, from: use.fridge.length ? 'fridge' : 'fresh', meal: snapshotOf(rid) }
   return data
 }
 
 export function skipMeal(data0: AppData, date: ISODate, slot: Slot): AppData {
   const data = clone(data0)
-  dayLog(data, date).slots[slot] = { st: 'skipped' }
+  dayLog(data, date).slots[slot] = { st: 'skipped', meal: snapshotOf(recipeIdAt(date, slot)) }
   return data
 }
 

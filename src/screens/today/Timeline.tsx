@@ -71,15 +71,15 @@ function MealNode({ date, today, slot, entry, source, isNext, tape, onEat, onSki
   const canMark = date <= today
   const state = entry ? (entry.st === 'eaten' ? 'eaten' : 'skipped') : isNext ? 'next' : 'pending'
 
-  // Отмеченный приём: одна строка названия и строка статуса с «Отменить».
+  // Отмеченный приём: название и ккал из снапшота в логе (что было на момент отметки).
   if (entry)
     return (
       <Row time={slot.time} marker={<MealMarker state={state} />}>
         <Link href={href} className="block">
-          <div className={cn('text-[16px] leading-snug font-medium text-ink-2', entry.st === 'skipped' && 'text-muted-foreground line-through decoration-1')}>{r.name}</div>
+          <div className={cn('text-[16px] leading-snug font-medium text-ink-2', entry.st === 'skipped' && 'text-muted-foreground line-through decoration-1')}>{entry.meal?.name ?? r.name}</div>
         </Link>
         <div className="num -mb-2 flex flex-wrap items-center gap-x-3 text-[13px] text-muted-foreground">
-          <span>{r.k} ккал</span>
+          <span>{entry.meal?.k ?? r.k} ккал</span>
           <SourceLine src={source} today={today} className="text-[13px]" />
           <button type="button" onClick={onUndo} className="-my-1 h-9 rounded-[10px] px-1.5 font-medium text-ink-2 underline decoration-line underline-offset-4 active:bg-surface-2">
             Отменить

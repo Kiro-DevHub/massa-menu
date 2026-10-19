@@ -76,7 +76,7 @@ describe('«Съел»', () => {
     const d0 = data({ pantry: { ...pantry } })
     const d1 = skipMeal(d0, MON, 's')
     expect(d1.pantry).toEqual(d0.pantry)
-    expect(d1.log[MON]!.slots.s).toEqual({ st: 'skipped' })
+    expect(d1.log[MON]!.slots.s).toMatchObject({ st: 'skipped', meal: { rid: 'bolognese', name: 'Паста болоньезе' } })
     expect(undoMeal(d1, MON, 's')).toEqual(d0)
   })
 
@@ -107,13 +107,13 @@ describe('«Заготовка сделана»', () => {
   })
 
   it('extra тоже списывается (горбуша на засолку во вторник)', () => {
-    const d0 = data({ pantry: { salmon: 500, beef: 500, rice: 1000, beefMince: 500, bulgur: 500, lavash: 200, plainYogurt: 250, veg: 1000 } })
+    const d0 = data({ pantry: { salmon: 500, pork: 500, sourCream: 300, rice: 1000, beefMince: 500, bulgur: 500, lavash: 200, plainYogurt: 250, veg: 1000 } })
     const d1 = doSession(d0, 'tue', TUE, seqIds())
-    expect(d1.pantry).toEqual({ salmon: 440, beef: 260, rice: 760, beefMince: 260, bulgur: 300, lavash: 200, plainYogurt: 250, veg: 1000 })
+    expect(d1.pantry).toEqual({ salmon: 440, pork: 240, sourCream: 220, rice: 780, beefMince: 260, bulgur: 300, lavash: 200, plainYogurt: 250, veg: 1000 })
   })
 
   it('отмена заготовки возвращает ровно то же', () => {
-    const d0 = data({ pantry: { ...pantry }, fridge: [tub({ id: 'x', key: 'goulash' })] })
+    const d0 = data({ pantry: { ...pantry }, fridge: [tub({ id: 'x', key: 'stroganoff' })] })
     const d1 = doSession(d0, 'sun', PREV_SUN, seqIds())
     expect(undoSession(d1, PREV_SUN, 'sun')).toEqual(d0)
   })
